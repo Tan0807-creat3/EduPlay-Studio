@@ -23,7 +23,7 @@ You can report a vulnerability using one of the following channels:
      - Screenshots or logs (only if they do not contain sensitive data)
 
 2. Send a direct email:
-   - Email: `tanntfx37798@funix.edu.vn`
+   - Email: `eduplay.line@hotmail.com` - `tannguyenthanh498@gmail.com`- `eduplay.pro@hotmail.com` - `tanntfx37798@funix.edu.vn`
    - Use a subject line starting with `[SECURITY]` so the report can be prioritized.
 
 ### Information to Include
@@ -54,4 +54,5 @@ After a fix has been released and users have had reasonable time to upgrade:
 ---
 
 Thank you for helping keep EduPlay Studio safe for teachers and students.
+
 
