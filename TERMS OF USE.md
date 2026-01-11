@@ -1,19 +1,24 @@
 # TERMS OF USE – EDUPLAY STUDIO
 
-**Last updated:** 17/12/2025
+**Last updated:** 11/1/2026
 
-Welcome to **EduPlay Studio**, an educational application designed to support teachers and learners in creating and experiencing interactive learning games.
+Welcome to **EduPlay Studio**, an educational application designed to support
+teachers and learners in creating and experiencing interactive learning games.
 
-By installing, accessing, or using EduPlay Studio, you agree to be bound by these Terms of Use.  
+By installing, accessing, or using EduPlay Studio, you agree to be bound by
+these Terms of Use.  
 If you do not agree, please discontinue use of the application.
 
 ---
 
 ## 1. Definitions
 
-- **Application**: The compiled and distributed EduPlay Studio application, including its interface, features, and bundled resources.
-- **User**: Any individual or organization using the application.
-- **Content**: Any questions, text, images, audio, data, or materials created or imported by users within the application.
+- **Application**: The compiled and distributed EduPlay Studio application,
+  including its interface, features, and bundled resources.
+- **Source Code**: The publicly available source code of EduPlay Studio.
+- **User**: Any individual or organization using the application or source code.
+- **Content**: Any questions, text, images, audio, data, or materials created
+  or imported by users within the application.
 
 ---
 
@@ -25,7 +30,8 @@ EduPlay Studio is intended solely for:
 - Creating and delivering interactive learning activities
 - Supporting teaching, learning, and knowledge presentation
 
-Users must not use the application for illegal activities or purposes contrary to educational ethics and social norms.
+The application and its source code **must not be used for commercial,
+exploitative, or illegal purposes**.
 
 ---
 
@@ -38,29 +44,37 @@ Users acknowledge and agree that they:
   - Violates any applicable law or regulation
   - Is offensive, violent, pornographic, or discriminatory
   - Infringes intellectual property or privacy rights of others
-- Will not intentionally disrupt the normal operation of the application or harm other users
+- Will not intentionally disrupt the normal operation of the application
+  or harm other users
+- Will not attempt to bypass licensing restrictions
 
 ---
 
 ## 4. Intellectual Property Notice
 
 - EduPlay Studio does **not claim ownership** over user-generated content.
-- The identity of EduPlay Studio (name, logo, visual identity, and official releases) remains the property of EduPlay Studio.
-- These Terms do **not** restrict any rights granted under the separate **MIT License** governing the source code.
+- The identity of EduPlay Studio (name, logo, visual identity, and official releases)
+  remains the intellectual property of the author.
+- The source code is **source-available and licensed for non-commercial use only**,
+  as described in the `LICENSE` file.
+- Commercial use of the application or source code is **not permitted**
+  without explicit written permission from the author.
 
 ---
 
 ## 5. User-Generated Content
 
 - Users retain full ownership of their content.
-- By using the application, users grant EduPlay Studio permission to store, process, and display content **only for functional and operational purposes**.
+- By using the application, users grant EduPlay Studio permission to store,
+  process, and display content **only for functional and educational purposes**.
 - EduPlay Studio does not monitor, verify, or endorse user-generated content.
 
 ---
 
 ## 6. Third-Party Resources
 
-The application may include third-party assets (such as images, sounds, or templates) used under their respective licenses.
+The application may include third-party assets (such as images, sounds,
+or templates) used under their respective licenses.
 
 Users are responsible for complying with any applicable third-party licensing terms.
 
@@ -71,7 +85,8 @@ Users are responsible for complying with any applicable third-party licensing te
 - Most data is stored locally or controlled by the user.
 - Users are responsible for backing up and protecting their data and devices.
 
-EduPlay Studio is not responsible for data loss caused by user actions, hardware failure, or circumstances beyond reasonable control.
+EduPlay Studio is not responsible for data loss caused by user actions,
+hardware failure, or circumstances beyond reasonable control.
 
 ---
 
@@ -84,13 +99,15 @@ EduPlay Studio does not guarantee that:
 - The application will operate without errors or interruptions
 - The software will meet all user expectations
 
-To the maximum extent permitted by law, EduPlay Studio shall not be liable for any damages arising from the use or inability to use the application.
+To the maximum extent permitted by law, EduPlay Studio shall not be liable
+for any damages arising from the use or inability to use the application.
 
 ---
 
 ## 9. Termination
 
-EduPlay Studio may restrict or terminate access to the application if these Terms are violated.
+EduPlay Studio may restrict or terminate access to the application
+if these Terms or the LICENSE are violated.
 
 Users may stop using the application at any time by uninstalling it.
 
@@ -99,7 +116,8 @@ Users may stop using the application at any time by uninstalling it.
 ## 10. Changes to Terms
 
 These Terms may be updated from time to time.  
-Continued use of the application after changes constitutes acceptance of the updated Terms.
+Continued use of the application after changes constitutes acceptance
+of the updated Terms.
 
 ---
 
@@ -114,9 +132,11 @@ If any provision is found invalid, the remaining provisions shall remain in effe
 ## 12. Contact Information
 
 **EduPlay Studio**  
+Author: Nguyễn Thanh Tân  
 Email: eduplay.line@hotmail.com  
-Project Repository: [https://github.com/Tan0807-creat3/EduPlay.git  ](https://github.com/Tan0807-creat3/EduPlay-Studio)
+Project Repository: https://github.com/Tan0807-creat3/EduPlay-Studio
 
 ---
 
-**By using EduPlay Studio, you acknowledge that you have read, understood, and agreed to these Terms of Use.**
+**By using EduPlay Studio, you acknowledge that you have read,
+understood, and agreed to these Terms of Use.**
