@@ -189,8 +189,11 @@ This repository is not only software — it is also a **learning resource**.
 
 EduPlay-Studio grows through shared effort.
 
-- New to open source? This is a safe place to start.
-- Experienced contributor? Your guidance matters.
-- Care about education? Your contribution makes a difference.
+- New to open source?
+  —› This is a safe place to start.
+- Experienced contributor?
+  —› Your guidance matters.
+- Care about education?
+  —› Your contribution makes a difference.
 
 Thank you for helping build **EduPlay-Studio** ❤️
