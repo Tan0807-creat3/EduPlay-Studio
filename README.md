@@ -1,6 +1,6 @@
 # EduPlay Studio
 
-[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CCByNc-yellow.svg)](https://creativecommons.org/licenses/by-nc/4.0/deed.en)
+[![License: PolyForm NC](https://img.shields.io/badge/License-PolyForm%20NC-5D4F85.svg)](https://polyformproject.org/licenses/noncommercial/1.0.0/)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![PySide6](https://img.shields.io/badge/PySide6-6.5+-green.svg)](https://pypi.org/project/PySide6/)
 [![GitHub](https://img.shields.io/badge/GitHub-Tan0807--creat3%2FEduPlay-blue)](https://github.com/Tan0807-creat3/EduPlay.git)
