@@ -87,3 +87,4 @@ saved_quizzes/
 
 # Security / local services
 firebase_hosting/
+firebase_service_account.b64
