@@ -1,18 +1,44 @@
+PolyForm Noncommercial License 1.0.0
+
 Copyright (c) 2026 Nguyễn Thanh Tân
 
-Permission is hereby granted to any person obtaining a copy of this software
-and associated documentation files (the "Software"), to use, copy, modify,
-and contribute to the Software for non-commercial purposes only.
+1. Rights Granted
 
-Commercial use, including but not limited to selling, sublicensing,
-or using the Software as part of a paid product or service, is strictly
-prohibited without prior written permission from the author.
+   Subject to the terms of this license, permission is granted to anyone to use,
+   copy, modify, and distribute this software in any form for any Noncommercial
+   Purpose.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+2. Noncommercial Purpose
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY.
+   "Noncommercial Purpose" means any use of the software where:
+   
+   a. the software is not being used in connection with any business activities;
+   b. the software is not being used to create a product or service for which
+      payment is required; and
+   c. the software is not being used by any entity (including a company,
+      organization, or government agency) for its internal business operations
+      or administration.
+
+   Using the software for personal experimentation, education, research, or
+   demonstration is a Noncommercial Purpose, provided no fees are charged for
+   access or use.
+
+3. Conditions
+
+   In order to preserve the rights granted under this license, you must:
+
+   a. include the full text of this license in any copy of the software you
+      distribute; and
+   b. ensure that any modifications you make are also licensed under this
+      license or a compatible license that includes the same Noncommercial
+      restrictions.
+
+4. Disclaimer
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+   FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+   IN THE SOFTWARE.
