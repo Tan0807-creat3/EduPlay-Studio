@@ -1,12 +1,18 @@
 # Contributing to EduPlay-Studio
 
-Thank you for your interest in contributing to **EduPlay-Studio** 🎓  
-Every contribution matters — whether it is code, documentation, design, testing, or thoughtful feedback.
+Thank you for showing interest in contributing to EduPlay-Studio.
 
-EduPlay-Studio is an **open-source, non-profit educational project**.  
-Our goal is not speed or hype, but **clarity, learning value, and long-term sustainability**.  
-All contributions should respect that spirit.
+We truly appreciate all forms of contribution — whether it is source code, documentation, design, testing, or constructive feedback. Every contribution matters and helps the project move forward. However, to avoid any misunderstanding, please note the following:
 
+Branches submitted by contributors will not be merged directly. Instead, they are treated as idea proposals, which the core team may review, adapt, and refine into an official version aligned with the project’s overall direction.
+
+Your name will not appear in the Contributors list, but your effort will always be acknowledged in the contribution notes of the next release and in the acknowledgements section.
+
+EduPlay-Studio is a non-profit, open-source educational project.
+
+Our goal is not speed or flashiness, but clarity, educational value, and long-term sustainability.
+
+All contributions should respect and support this spirit.
 ---
 
 ## Project Links
