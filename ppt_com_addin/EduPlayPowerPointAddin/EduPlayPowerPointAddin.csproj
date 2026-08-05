@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Platforms>x64</Platforms>
+    <PlatformTarget>x64</PlatformTarget>
+    <OutputType>Library</OutputType>
+    <AssemblyName>EduPlayPowerPointAddin</AssemblyName>
+    <RootNamespace>EduPlay.PowerPointAddin</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <ComVisible>true</ComVisible>
+    <LangVersion>latest</LangVersion>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Interop.PowerPoint" />
+    <Reference Include="office" />
+    <Reference Include="stdole" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2592.51" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Ribbon.xml" />
+    <EmbeddedResource Include="..\..\eduplay_studio\eduplay\resources\icons\file-import.ico" Link="Resources\file-import.ico" />
+  </ItemGroup>
+</Project>

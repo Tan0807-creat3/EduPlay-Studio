@@ -1,0 +1,3416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ i18n_title }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(180deg, #cdeffd 0%, #a2e0f8 30%, #6ecae8 65%, #3baede 100%);
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(180deg, #caeefc 0%, #9be0f7 28%, #67cbe9 65%, #34a9dc 100%);
+        }
+        .layer {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+        #layer-far { z-index: 0; }
+        #layer-mid { z-index: 3; }
+        #layer-near { z-index: 6; }
+        #layer-bottom { z-index: 2; }
+        #background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.0;
+        }
+        .vignette { position:absolute; inset:0; pointer-events:none; z-index: 20; background: radial-gradient(120% 100% at 50% 50%, rgba(255,255,255,0) 60%, rgba(255,255,255,0.18) 100%); }
+        .caustics { position:absolute; inset:0; pointer-events:none; z-index: 5; mix-blend-mode: soft-light; opacity: 0.45; background-image: radial-gradient(circle at 30% 10%, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 40%), radial-gradient(circle at 70% 20%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 45%); animation: caustics 12s infinite linear; }
+        @keyframes caustics { 0% { background-position: 0 0, 0 0; } 100% { background-position: 300px 0, -300px 0; } }
+        .rays { position:absolute; inset:0; pointer-events:none; z-index: 4; background-image: linear-gradient(115deg, rgba(255,255,255,0.12) 0 12%, rgba(255,255,255,0) 12% 32%, rgba(255,255,255,0.1) 32% 42%, rgba(255,255,255,0) 42% 62%, rgba(255,255,255,0.1) 62% 72%, rgba(255,255,255,0) 72%); transform: translateY(-20%); animation: rays 8s infinite alternate ease-in-out; }
+        @keyframes rays { from { transform: translateY(-20%) rotate(0.5deg); } to { transform: translateY(0%) rotate(-0.5deg); } }
+        
+        /* Interactive Clickable Fish - PROMINENT & LARGE */
+        .fish {
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.15s ease, filter 0.2s ease;
+            will-change: transform;
+            user-select: none;
+            z-index: 35; /* Above background elements and seaweed */
+            filter: drop-shadow(0 0 12px rgba(255, 235, 59, 0.95)) drop-shadow(0 0 24px rgba(56, 189, 248, 0.85)) drop-shadow(0 8px 12px rgba(0,0,0,0.45));
+            animation: fishPulseGlow 2.5s infinite ease-in-out;
+        }
+        @keyframes fishPulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 235, 59, 0.9)) drop-shadow(0 0 20px rgba(56, 189, 248, 0.8)) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.4)); }
+            50% { filter: drop-shadow(0 0 20px rgba(255, 255, 255, 1)) drop-shadow(0 0 35px rgba(245, 158, 11, 0.95)) drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5)); }
+        }
+        .fish:hover {
+            transform: scale(1.22) !important;
+            filter: drop-shadow(0 0 24px rgba(255, 255, 255, 1)) drop-shadow(0 0 42px rgba(245, 158, 11, 1)) drop-shadow(0 12px 22px rgba(0,0,0,0.6));
+            z-index: 40;
+        }
+        
+        /* Non-interactive Background Fish (Cá nền - mờ, nhỏ, bơi nhẹ nhàng) */
+        .bg-fish {
+            position: absolute;
+            pointer-events: none;
+            z-index: 3;
+            opacity: 0.60;
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+            will-change: transform, left, top;
+        }
+        
+        .bubble {
+            position: absolute;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="rgba(255,255,255,0.35)" stroke="rgba(255,255,255,0.6)" stroke-width="1.2"/></svg>');
+            background-size: contain;
+            background-repeat: no-repeat;
+            will-change: transform;
+            z-index: 12;
+            border-radius: 50%;
+            background-color: rgba(255,255,255,0.15);
+            box-shadow: inset 0 0 6px rgba(255,255,255,0.4);
+            filter: drop-shadow(0 0 6px rgba(255,255,255,0.4));
+        }
+        .seaweed {
+            position: absolute;
+            pointer-events: none;
+            will-change: transform;
+            z-index: 10;
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.3));
+        }
+        .decor { position:absolute; pointer-events:none; }
+        .rock { filter: drop-shadow(0 4px 3px rgba(0,0,0,0.4)); z-index:11; }
+        .tiny-fish { position:absolute; z-index:2; opacity:0.55; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); }
+        .jelly { position:absolute; width:22px; height:22px; border-radius:50% 50% 40% 40%; background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.2), rgba(181,229,255,0.35) 40%, rgba(135,206,250,0.2)); box-shadow: 0 1px 6px rgba(0,0,0,0.18); opacity:0.4; z-index:4; }
+        .jelly::after { content:""; position:absolute; left:8px; right:8px; bottom:-12px; height:16px; background: linear-gradient(180deg, rgba(181,229,255,0.6), rgba(135,206,250,0.4)); border-radius:8px; filter: blur(0.5px); }
+        .ambient { position:absolute; z-index:2; opacity:0.35; filter: blur(0.2px) saturate(70%); }
+        .ambient.star { width:16px; height:16px; }
+        .ambient.star::before, .ambient.star::after { content:""; position:absolute; left:7px; top:0; width:2px; height:16px; background:#ffd966; box-shadow:0 0 6px rgba(255,217,102,0.8); transform-origin:center; }
+        .ambient.star::before { transform: rotate(36deg); }
+        .ambient.star::after { transform: rotate(-36deg); }
+        .ambient.dot { width:12px; height:6px; border-radius:50% 50% 40% 40%; background: radial-gradient(circle at 40% 40%, rgba(255,255,255,0.8), rgba(255,255,255,0.2)); }
+        
+        /* Realistic Layered Seabed Terrain Matching Kenney Style 100% */
+        #terrain-container {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 130px;
+            pointer-events: none;
+            z-index: 6;
+            overflow: hidden;
+        }
+        .terrain-layer {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            pointer-events: none;
+        }
+        .terrain-dirt-bottom {
+            bottom: 0;
+            height: 95px;
+            background: linear-gradient(180deg, #814f28 0%, #63391b 100%);
+            clip-path: polygon(0 25%, 15% 15%, 35% 32%, 58% 12%, 80% 28%, 100% 18%, 100% 100%, 0 100%);
+            z-index: 5;
+            box-shadow: inset 0 6px 10px rgba(0,0,0,0.35);
+        }
+        .terrain-sand-top {
+            bottom: 18px;
+            height: 75px;
+            background: linear-gradient(180deg, #e5c178 0%, #c39c4a 100%);
+            clip-path: polygon(0 15%, 25% 38%, 48% 14%, 72% 35%, 100% 10%, 100% 100%, 0 100%);
+            z-index: 7;
+            box-shadow: inset 0 4px 8px rgba(255,255,255,0.45);
+        }
+        #question-panel {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.98);
+            border: 2px solid #10B981;
+            border-radius: 22px;
+            padding: 58px 28px 24px 28px;
+            width: 88%;
+            max-width: 620px;
+            z-index: 100;
+            color: #0F172A;
+            box-shadow: 0 20px 45px rgba(148, 163, 184, 0.22);
+            max-height: min(78vh, 760px);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        #question-panel.matching-mode {
+            width: 92%;
+            max-width: 760px;
+        }
+        #question-panel.open { animation: panelIn 180ms ease-out; }
+        @keyframes panelIn { from { transform: translate(-50%, -50%) scale(0.98); opacity: 0.0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1.0; } }
+        #question-timer {
+            position: absolute;
+            top: 14px;
+            left: 20px;
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            color: #1e1b4b;
+            border: 1px solid #a5b4fc;
+            padding: 5px 12px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.15);
+            display: none;
+            z-index: 105;
+        }
+        #question-fish-badge {
+            position: absolute;
+            top: 12px;
+            right: 18px;
+            width: 64px;
+            height: 64px;
+            background: radial-gradient(circle, #ffffff 50%, #e0f2fe 100%);
+            border: 3px solid #0ea5e9;
+            border-radius: 50%;
+            box-shadow: 0 8px 20px rgba(125, 211, 252, 0.36), inset 0 0 10px rgba(56, 189, 248, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 7px;
+            z-index: 110;
+            animation: fishBadgePop 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        #question-fish-badge img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.25));
+        }
+        @keyframes fishBadgePop {
+            0% { transform: scale(0) rotate(-15deg); opacity: 0; }
+            80% { transform: scale(1.15) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        #question-text {
+            font-size: 1.18em;
+            font-weight: 600;
+            line-height: 1.55;
+            margin-bottom: 22px;
+            text-align: center;
+            padding: 0 92px 0 24px;
+            color: #0F172A;
+        }
+        #question-text.fill-blank-inline {
+            padding-right: 24px;
+        }
+        .question-inline-wrap {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            max-width: 100%;
+        }
+        .question-inline-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        #question-image-container {
+            display: none;
+            margin: 0 auto 18px auto;
+            max-width: min(280px, 100%);
+            text-align: center;
+        }
+        #question-image {
+            max-width: 100%;
+            max-height: 180px;
+            border-radius: 14px;
+            object-fit: contain;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+            border: 1px solid rgba(125, 211, 252, 0.65);
+            background: rgba(255, 255, 255, 0.92);
+        }
+        #options-container { width: 100%; margin-top: 4px; }
+        #options-container.options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+        #options-container.options-stack { display: block; }
+        .matching-instruction {
+            margin: 0 0 14px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #475569;
+        }
+        .matching-board {
+            position: relative;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 88px;
+            width: 100%;
+            padding: 10px 10px 6px;
+            box-sizing: border-box;
+        }
+        .matching-column {
+            position: relative;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 2;
+        }
+        .matching-column-title {
+            font-size: 0.92rem;
+            font-weight: 800;
+            letter-spacing: 0.02em;
+            text-transform: uppercase;
+            color: #0369a1;
+            text-align: center;
+        }
+        .match-card {
+            min-height: 56px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            border: 2px solid rgba(147, 197, 253, 0.65);
+            background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(240,249,255,0.96));
+            box-shadow: 0 12px 24px rgba(148, 163, 184, 0.16);
+            font-size: 0.98rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: #0f172a;
+            text-align: left;
+            cursor: pointer;
+            transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease, background 120ms ease;
+            word-break: break-word;
+        }
+        .match-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 26px rgba(148, 163, 184, 0.18);
+            border-color: rgba(14, 165, 233, 0.85);
+        }
+        .match-card.selected {
+            border-color: #0ea5e9;
+            background: linear-gradient(135deg, rgba(224, 242, 254, 1), rgba(186, 230, 253, 0.95));
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.18), 0 16px 26px rgba(14, 165, 233, 0.16);
+        }
+        .match-card.matched {
+            border-color: #10b981;
+            background: linear-gradient(135deg, rgba(236, 253, 245, 1), rgba(209, 250, 229, 0.96));
+        }
+        .match-card:disabled {
+            opacity: 1;
+        }
+        .match-link-layer {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: visible;
+            z-index: 1;
+        }
+        .match-link-path {
+            fill: none;
+            stroke: rgba(14, 165, 233, 0.95);
+            stroke-width: 4;
+            stroke-linecap: round;
+            filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.35));
+        }
+        .match-link-node {
+            fill: #ffffff;
+            stroke: #0ea5e9;
+            stroke-width: 3;
+        }
+        .text-answer-layout {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .text-answer-wrap {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .text-input {
+            display: block;
+            width: min(92%, 560px);
+            max-width: 100%;
+            margin: 0 auto;
+            box-sizing: border-box;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(147,197,253,0.75);
+            outline: none;
+            box-shadow: 0 10px 22px rgba(148, 163, 184, 0.16);
+            font-size: 1rem;
+        }
+        .text-input:focus { border-color: #10B981; box-shadow: 0 0 0 4px rgba(16,185,129,0.18), 0 12px 22px rgba(148, 163, 184, 0.18); }
+        .inline-blank-input {
+            display: inline-block;
+            width: clamp(140px, 24vw, 240px);
+            min-width: 140px;
+            max-width: 100%;
+            margin: 4px 0;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .question-controls { margin-top: 14px; display: flex; justify-content: center; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .option {
+            appearance: none;
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 76px;
+            padding: 15px 22px 15px 60px;
+            margin: 0;
+            border-radius: 18px;
+            cursor: pointer;
+            background: linear-gradient(135deg, rgba(239,246,255,0.98), rgba(236,253,245,0.98));
+            transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease, border-color 140ms ease, filter 140ms ease;
+            border: 1px solid rgba(59, 130, 246, 0.24);
+            box-shadow: 0 12px 28px rgba(148, 163, 184, 0.18);
+            user-select: none;
+            text-align: left;
+            color: #0f172a;
+            font: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.5;
+            letter-spacing: 0.01em;
+            overflow: hidden;
+        }
+        .option::before {
+            content: attr(data-choice-label);
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.96);
+            border: 2px solid rgba(125, 211, 252, 0.92);
+            color: #0369a1;
+            font-size: 0.95rem;
+            font-weight: 800;
+            box-shadow: 0 6px 14px rgba(14, 165, 233, 0.16);
+        }
+        .option::after {
+            display: none;
+            content: '';
+        }
+        .option:hover {
+            background: linear-gradient(135deg, rgba(224,242,254,1), rgba(209,250,229,1));
+            transform: translateY(-2px);
+            box-shadow: 0 18px 34px rgba(148, 163, 184, 0.2);
+            border-color: rgba(14, 165, 233, 0.44);
+        }
+        .option:active {
+            transform: translateY(0);
+            filter: brightness(0.99);
+        }
+        .option:focus-visible {
+            outline: none;
+            border-color: rgba(14, 165, 233, 0.72);
+            box-shadow: 0 0 0 5px rgba(56, 189, 248, 0.18), 0 18px 34px rgba(148, 163, 184, 0.2);
+        }
+        .option.selected {
+            background: linear-gradient(135deg, rgba(224,242,254,1), rgba(191,219,254,0.98));
+            border-color: rgba(14, 165, 233, 0.72);
+            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.14), 0 16px 30px rgba(14, 165, 233, 0.18);
+        }
+        .option.selected::before {
+            background: linear-gradient(135deg, #0ea5e9, #38bdf8);
+            border-color: rgba(14, 165, 233, 0.98);
+            color: #ffffff;
+        }
+        .option.correct {
+            background: linear-gradient(135deg, rgba(220,252,231,1), rgba(167,243,208,0.98));
+            border-color: rgba(16, 185, 129, 0.78);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.14), 0 18px 32px rgba(16, 185, 129, 0.16);
+        }
+        .option.correct::before {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            border-color: rgba(16, 185, 129, 0.96);
+            color: #ffffff;
+        }
+        .option.wrong {
+            background: linear-gradient(135deg, rgba(254,242,242,0.98), rgba(254,226,226,0.98));
+            border-color: rgba(244, 63, 94, 0.62);
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.12), 0 16px 30px rgba(244, 63, 94, 0.12);
+        }
+        .option.wrong::before {
+            background: linear-gradient(135deg, #fb7185, #f43f5e);
+            border-color: rgba(244, 63, 94, 0.92);
+            color: #ffffff;
+        }
+        .option:disabled,
+        .option[aria-disabled="true"] {
+            cursor: default;
+        }
+        .match-card.wrong {
+            border-color: rgba(244, 63, 94, 0.8);
+            background: linear-gradient(135deg, rgba(254, 226, 226, 0.98), rgba(254, 202, 202, 0.96));
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.14), 0 16px 26px rgba(244, 63, 94, 0.12);
+        }
+        #score-display {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.96));
+            color: #1F2937;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 92px;
+            min-height: 54px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 1.75em;
+            z-index: 50;
+            box-shadow: 0 12px 26px rgba(186, 230, 253, 0.4);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(125, 211, 252, 0.85);
+        }
+        #score-display #score {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            width: 100%;
+            min-height: 100%;
+        }
+        #timer {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.96), rgba(239, 246, 255, 0.96));
+            color: #1F2937;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 1.2em;
+            z-index: 50;
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(125, 211, 252, 0.85);
+            box-shadow: 0 12px 26px rgba(186, 230, 253, 0.4);
+            display: none;
+        }
+        #caught-fish-hud {
+            position: fixed;
+            top: 72px;
+            left: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.94), rgba(224, 242, 254, 0.94));
+            border: 2px solid #0ea5e9;
+            border-radius: 22px;
+            box-shadow: 0 10px 24px rgba(125, 211, 252, 0.35);
+            backdrop-filter: blur(8px);
+            z-index: 50;
+            max-width: calc(100vw - 220px);
+            overflow-x: auto;
+            transition: transform 0.2s ease;
+        }
+        .hud-label {
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #0369a1;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            user-select: none;
+        }
+        #caught-fish-list {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hud-fish-item {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 50%, #e0f2fe 100%);
+            border: 2px solid #0ea5e9;
+            box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            animation: hudFishPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            transition: transform 0.2s ease;
+        }
+        .hud-fish-item:hover {
+            transform: scale(1.22);
+        }
+        .hud-fish-item img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.25));
+        }
+        @keyframes hudFishPop {
+            0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+            80% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.25; } 100% { opacity: 1; } }
+        .heart { position: absolute; width: 16px; height: 16px; transform: rotate(45deg); background: #ff7ab6; }
+        .heart::before, .heart::after { content: ''; position: absolute; width: 16px; height: 16px; background: #ff7ab6; border-radius: 50%; }
+        .heart::before { left: -8px; }
+        .heart::after { top: -8px; }
+        .sparkle { position: absolute; width: 6px; height: 6px; background: #fff59d; border-radius: 50%; box-shadow: 0 0 8px rgba(255,245,157,0.9); }
+        #game-over {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(239,246,255,0.76), rgba(219,234,254,0.84));
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #0F172A;
+            text-align: center;
+            backdrop-filter: blur(6px);
+        }
+        #final-score {
+            font-size: 2.5em;
+            color: #10B981;
+            margin: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 56px;
+            line-height: 1;
+            vertical-align: middle;
+        }
+
+        /* Water Splash Ripple Animation Effect */
+        .splash-ring {
+            position: absolute;
+            pointer-events: none;
+            z-index: 120;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, 0.95);
+            box-shadow: 0 0 22px rgba(56, 189, 248, 0.95), inset 0 0 14px rgba(255, 255, 255, 0.85);
+            transform: translate(-50%, -50%) scale(0.2);
+            animation: splashExpand 0.6s cubic-bezier(0.1, 0.85, 0.25, 1) forwards;
+        }
+        .splash-ring-inner {
+            position: absolute;
+            pointer-events: none;
+            z-index: 119;
+            border-radius: 50%;
+            border: 2px solid rgba(186, 230, 253, 0.9);
+            box-shadow: 0 0 12px rgba(14, 165, 233, 0.8);
+            transform: translate(-50%, -50%) scale(0.1);
+            animation: splashExpand 0.45s cubic-bezier(0.1, 0.85, 0.25, 1) 0.06s forwards;
+        }
+        @keyframes splashExpand {
+            0% {
+                transform: translate(-50%, -50%) scale(0.15);
+                opacity: 1;
+                border-width: 4px;
+            }
+            60% {
+                opacity: 0.85;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(2.8);
+                opacity: 0;
+                border-width: 1px;
+            }
+        }
+        .splash-particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 121;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff 40%, #7dd3fc 100%);
+            box-shadow: 0 0 8px #38bdf8;
+            transform: translate(-50%, -50%);
+            animation: dropletFly 0.55s ease-out forwards;
+        }
+        @keyframes dropletFly {
+            0% {
+                transform: translate(-50%, -50%) translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0.2);
+                opacity: 0;
+            }
+        }
+        .catch-text-badge {
+            position: absolute;
+            pointer-events: none;
+            z-index: 125;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(2, 132, 199, 0.9), 0 0 12px #38bdf8;
+            transform: translate(-50%, -50%) scale(0.5);
+            animation: catchPop 0.8s cubic-bezier(0.17, 0.89, 0.32, 1.28) forwards;
+        }
+        @keyframes catchPop {
+            0% {
+                transform: translate(-50%, -50%) scale(0.4) translateY(0);
+                opacity: 0;
+            }
+            30% {
+                transform: translate(-50%, -50%) scale(1.15) translateY(-15px);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1) translateY(-40px);
+                opacity: 0;
+            }
+        }
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 999px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s;
+            box-shadow: 0 12px 26px rgba(125, 211, 252, 0.34);
+        }
+        #restart-btn {
+            background-color: #10B981;
+            color: white;
+        }
+        #restart-btn:hover {
+            background-color: #059669;
+            transform: translateY(-2px);
+        }
+        #explanation {
+            margin-top: 20px;
+            padding: 14px 14px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(239,246,255,0.96));
+            border: 1px solid rgba(125, 211, 252, 0.55);
+            border-left: 6px solid #10B981;
+            border-radius: 14px;
+            display: none;
+            box-shadow: 0 14px 28px rgba(148, 163, 184, 0.18);
+            max-height: min(220px, 30vh);
+            overflow: auto;
+        }
+        #explanation .explain-head { font-weight: 800; color: #065F46; margin-bottom: 6px; letter-spacing: 0.2px; }
+        #explanation .explain-body { line-height: 1.6; color: #0F172A; opacity: 0.95; }
+        #explanation .answer-head {
+            margin-bottom: 6px;
+            font-weight: 800;
+            color: #075985;
+            letter-spacing: 0.2px;
+        }
+        #explanation .answer-body {
+            line-height: 1.55;
+            color: #0f172a;
+            background: linear-gradient(135deg, rgba(224,242,254,0.95), rgba(236,253,245,0.95));
+            border: 1px solid rgba(125, 211, 252, 0.6);
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            font-weight: 700;
+        }
+        #explanation .answer-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        #explanation .answer-item {
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.82);
+            border: 1px solid rgba(147, 197, 253, 0.42);
+        }
+        .game-over-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(239,246,255,0.96));
+            border: 1px solid rgba(125, 211, 252, 0.55);
+            border-radius: 18px;
+            padding: 24px 26px;
+            width: min(560px, 92vw);
+            box-shadow: 0 20px 44px rgba(148, 163, 184, 0.24);
+            backdrop-filter: blur(10px);
+            color: #0F172A;
+        }
+        .game-over-card h1 { margin: 0 0 10px; font-size: 28px; }
+        .game-over-card .score-line {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin: 10px auto 2px;
+            font-size: 16px;
+            opacity: 0.92;
+            white-space: nowrap;
+        }
+        .game-over-card .score-label {
+            display: inline-flex;
+            align-items: center;
+            font-size: 1.25rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #1f2937;
+        }
+        @media (max-width: 720px) {
+            #options-container.options-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+    <style>
+        /* Mobile Responsiveness Improvements */
+        @media (max-width: 768px) {
+            #question-panel {
+                width: 95% !important;
+                max-width: none !important;
+                padding: 16px !important;
+            }
+            #question-text {
+                font-size: 1.2em !important;
+            }
+            .option {
+                min-height: 68px !important;
+                padding: 14px 18px 14px 54px !important;
+                font-size: 0.98em !important;
+            }
+            /* Adjust HUD */
+            #hud-score, #hud-timer {
+                font-size: 1.2em !important;
+                padding: 6px 12px !important;
+            }
+            #hud-timer {
+                top: 60px !important;
+                right: 16px !important;
+            }
+            /* Make fish easier to tap */
+            .fish {
+                padding: 10px; /* Increase touch area */
+                margin: -10px;
+            }
+            .matching-board {
+                gap: 36px;
+                padding-inline: 4px;
+            }
+            .match-card {
+                min-height: 52px;
+                padding: 10px 12px;
+                font-size: 0.92rem;
+            }
+            #question-fish-badge {
+                width: 56px;
+                height: 56px;
+                right: 12px;
+            }
+            #question-text {
+                padding: 0 72px 0 12px;
+            }
+        }
+        
+        /* Landscape on Mobile optimization */
+        @media (max-height: 500px) and (orientation: landscape) {
+            #question-panel {
+                top: 50%;
+                transform: translate(-50%, -50%) scale(0.9);
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            .seaweed { height: 50px !important; }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div class="rays"></div>
+        <div class="caustics"></div>
+        <div id="layer-far" class="layer">
+            <img id="background" src="" alt="">
+        </div>
+        <div id="layer-mid" class="layer"></div>
+        <div id="layer-near" class="layer"></div>
+        <div id="layer-bottom" class="layer"></div>
+        <div id="score-display" aria-label="{{ i18n_score }}"><span id="score">0</span></div>
+        <div id="timer">{{ i18n_time }}: <span id="time">60</span>s</div>
+        <div id="caught-fish-hud">
+            <div class="hud-label">🐟 <span id="caught-count">0</span></div>
+            <div id="caught-fish-list"></div>
+        </div>
+        <div class="vignette"></div>
+        <div id="hud-debug" style="position:absolute; left:8px; bottom:8px; color:#0f172a; font-size:11px; z-index:50; background:rgba(255,255,255,0.78); border:1px solid rgba(147,197,253,0.55); padding:4px 6px; border-radius:8px; display:none"></div>
+    </div>
+
+    <div id="question-panel">
+        <div id="question-timer">30s</div>
+        <div id="question-fish-badge" style="display:none;"><img id="question-fish-img" src="" alt="Cá chọn"></div>
+        <div id="question-text"></div>
+        <div id="question-image-container"><img id="question-image" src="" alt="Hình câu hỏi"></div>
+        <div id="options-container"></div>
+        <div id="explanation"></div>
+        <div class="question-controls">
+            <button id="submit-btn" class="btn" style="display:none; background-color:#10B981; color:#fff;">{{ i18n_submit }}</button>
+            <button id="continue-btn" class="btn" style="display:none; background-color:#0EA5E9; color:#fff;">{{ i18n_next }}</button>
+        </div>
+    </div>
+
+    <div id="game-over">
+        <div class="game-over-card">
+            <h1>{{ i18n_completed }}</h1>
+            <div class="score-line"><span class="score-label">{{ i18n_score }}:</span><span id="final-score">0</span></div>
+            <button id="restart-btn" class="btn">{{ i18n_play_again }}</button>
+        </div>
+    </div>
+
+        <div id="start-overlay" style="position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, rgba(239,246,255,0.72), rgba(219,234,254,0.82));z-index:200;backdrop-filter:blur(6px);">
+        <div style="background:rgba(255,255,255,0.96);border:1px solid rgba(16,185,129,0.45);color:#0F172A;border-radius:16px;padding:20px 26px;text-align:center;backdrop-filter:blur(6px);box-shadow:0 18px 40px rgba(148,163,184,0.24);max-width:520px;">
+            <div style="font-weight:700;font-size:20px;margin-bottom:10px">{{ i18n_start_title }}</div>
+            <p style="font-size:14px;margin-bottom:16px;">{{ i18n_start_rules }}</p>
+            <button id="start-btn" class="btn" style="background:#10B981;color:#fff;border-radius:999px;padding-inline:32px" title="{{ i18n_start_rules }}">{{ i18n_start_button }}</button>
+        </div>
+    </div>
+
+    <audio id="bgm" loop>
+        <source src="" type="audio/mpeg">
+        {{ i18n_audio_not_supported }}
+    </audio>
+    <audio id="click-sound">
+        <source src="" type="audio/wav">
+    </audio>
+    <audio id="correct-sound">
+        <source src="" type="audio/wav">
+    </audio>
+    <audio id="wrong-sound">
+        <source src="" type="audio/wav">
+    </audio>
+
+    <script>
+        // Game configuration
+        const config = {
+            fishCount: 10,
+            baseSpeed: 2.0,
+            timeLimit: 60, // seconds
+            showExplanations: true,
+            randomizeQuestions: true,
+            exportMode: 'student'
+        };
+
+        // Game state
+        let score = 0;
+        let timeLeft = config.timeLimit;
+        let gameActive = false;
+        let timerInterval;
+        let questionTimer = null;
+        let questionTimeLeft = 0;
+        let currentQuestionIndex = -1;
+        let currentQuestionType = 'multiple_choice';
+        let questions = [];
+        let fishSprites = [];
+        let activeFish = [];
+        let bubbles = [];
+        let lastTime = 0;
+        let customBackgroundSet = false;
+        let seaweedsStatic = [];
+        let seaweedsFloating = [];
+        let tinyFish = [];
+        let jellies = [];
+        let ambient = [];
+        let bgFishObjects = [];
+
+        // DOM elements
+        const gameContainer = document.getElementById('game-container');
+        const layerFar = document.getElementById('layer-far');
+        const layerMid = document.getElementById('layer-mid');
+        const layerNear = document.getElementById('layer-near');
+        const layerBottom = document.getElementById('layer-bottom');
+        const background = document.getElementById('background');
+        const scoreDisplay = document.getElementById('score');
+        const timerDisplay = document.getElementById('time');
+        const questionPanel = document.getElementById('question-panel');
+        const questionText = document.getElementById('question-text');
+        const questionImageContainer = document.getElementById('question-image-container');
+        const questionImage = document.getElementById('question-image');
+        const optionsContainer = document.getElementById('options-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const continueBtn = document.getElementById('continue-btn');
+        const submitBtnDefaultText = submitBtn ? submitBtn.textContent : '';
+        const explanationDiv = document.getElementById('explanation');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalScore = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+        const bgm = document.getElementById('bgm');
+        const clickSound = document.getElementById('click-sound');
+        const correctSound = document.getElementById('correct-sound');
+        const wrongSound = document.getElementById('wrong-sound');
+        const feedbackSoundPools = { correct: [], wrong: [] };
+        const feedbackSoundLastIndex = { correct: -1, wrong: -1 };
+        let hudMap = {};
+        let sceneAssetMap = {};
+        const waterSound = clickSound;
+        let matchingState = null;
+        let lastSelectedIndex = null;
+        let teachingMode = false;
+
+        function normalizeFeedbackAudioSrc(value) {
+            try {
+                const src = String(value || '').trim();
+                if (!src) return '';
+                if (src.startsWith('data:')) return src;
+                return `data:audio/wav;base64,${src}`;
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function createFeedbackSoundEntry(item) {
+            try {
+                if (!item) return null;
+                const rawSrc = typeof item === 'string' ? item : (item.src || item.audio || item.url || '');
+                const src = normalizeFeedbackAudioSrc(rawSrc);
+                if (!src) return null;
+                const audio = new Audio(src);
+                audio.preload = 'auto';
+                return { audio };
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function initFeedbackSoundPools(rawPools) {
+            try {
+                feedbackSoundPools.correct = (Array.isArray(rawPools && rawPools.correct) ? rawPools.correct : [])
+                    .map(createFeedbackSoundEntry)
+                    .filter(Boolean);
+                feedbackSoundPools.wrong = (Array.isArray(rawPools && rawPools.wrong) ? rawPools.wrong : [])
+                    .map(createFeedbackSoundEntry)
+                    .filter(Boolean);
+            } catch (e) {
+                feedbackSoundPools.correct = [];
+                feedbackSoundPools.wrong = [];
+            }
+        }
+
+        function pickFeedbackSoundEntry(kind) {
+            try {
+                const pool = feedbackSoundPools[kind] || [];
+                if (!pool.length) return null;
+                if (pool.length === 1) {
+                    feedbackSoundLastIndex[kind] = 0;
+                    return pool[0];
+                }
+                let nextIndex = Math.floor(Math.random() * pool.length);
+                if (nextIndex === feedbackSoundLastIndex[kind]) {
+                    nextIndex = (nextIndex + 1 + Math.floor(Math.random() * (pool.length - 1))) % pool.length;
+                }
+                feedbackSoundLastIndex[kind] = nextIndex;
+                return pool[nextIndex];
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function playFeedbackCue(kind) {
+            try {
+                const entry = pickFeedbackSoundEntry(kind);
+                if (entry && entry.audio) {
+                    try {
+                        const fallback = kind === 'correct' ? correctSound : wrongSound;
+                        entry.audio.volume = Number(fallback && fallback.volume) || 1;
+                    } catch (e) {}
+                    playSound(entry.audio);
+                    return;
+                }
+            } catch (e) {}
+            playSound(kind === 'correct' ? correctSound : wrongSound);
+        }
+
+        function defaultAssetPath(assetName) {
+            return `../kenney_platformer-kit/PNG/Default/${assetName}`;
+        }
+
+        function localAssetPath(assetName) {
+            return `kenney_platformer-kit/PNG/Default/${assetName}`;
+        }
+
+        function inferAssetName(value) {
+            try {
+                if (!value || typeof value !== 'string' || value.startsWith('data:')) return '';
+                const clean = value.split('?')[0].split('#')[0];
+                const parts = clean.split('/');
+                return parts[parts.length - 1] || '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function setImageSource(img, candidates) {
+            if (!img) return;
+            const queue = [];
+            (candidates || []).forEach(candidate => {
+                if (typeof candidate !== 'string' || !candidate) return;
+                if (!queue.includes(candidate)) queue.push(candidate);
+            });
+            if (!queue.length) return;
+            let idx = 0;
+            img.onerror = () => {
+                idx += 1;
+                if (idx < queue.length) {
+                    img.src = queue[idx];
+                    return;
+                }
+                img.onerror = null;
+            };
+            img.src = queue[idx];
+        }
+
+        function setSceneImage(img, assetName, explicitPath = '') {
+            const embedded = assetName ? sceneAssetMap[assetName] : '';
+            const candidates = [];
+            if (embedded) candidates.push(embedded);
+            if (explicitPath) candidates.push(explicitPath);
+            if (assetName) {
+                candidates.push(defaultAssetPath(assetName));
+                candidates.push(localAssetPath(assetName));
+            }
+            setImageSource(img, candidates);
+        }
+
+        function getHudGlyphCandidates(token) {
+            const key = String(token || '');
+            const candidates = [];
+            if (hudMap && hudMap[key]) candidates.push(hudMap[key]);
+
+            const assetNames = {
+                percent: 'hud_percent.png',
+                plus: 'hud_plus.png',
+                colon: 'hud_colon.png',
+                dot: 'hud_dot.png'
+            };
+            const assetName = (/^\d$/.test(key)) ? `hud_number_${key}.png` : assetNames[key];
+            if (assetName) {
+                candidates.push(defaultAssetPath(assetName));
+                candidates.push(localAssetPath(assetName));
+            }
+            return candidates.filter(Boolean);
+        }
+
+        // Load game configuration from URL parameters or use defaults
+        function loadConfig() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Load game settings
+            config.fishCount = parseInt(urlParams.get('fishCount')) || 10;
+            config.baseSpeed = parseFloat(urlParams.get('baseSpeed')) || 2.0;
+            config.timeLimit = parseInt(urlParams.get('timeLimit')) || 60;
+            config.showExplanations = urlParams.get('showExplanations') !== 'false';
+            config.randomizeQuestions = urlParams.get('randomizeQuestions') !== 'false';
+            config.exportMode = String(urlParams.get('exportMode') || 'student').toLowerCase() === 'teaching' ? 'teaching' : 'student';
+
+            try {
+                const gameDataElement = document.getElementById('game-data');
+                const gameData = gameDataElement ? JSON.parse(gameDataElement.textContent) : null;
+                const cfg = gameData ? (gameData.game_config || {}) : {};
+                hudMap = cfg.hud_digits_base64 || {};
+                sceneAssetMap = cfg.scene_asset_map_base64 || {};
+                if (typeof cfg.fish_count !== 'undefined') {
+                    const fc = parseInt(cfg.fish_count);
+                    if (!isNaN(fc) && fc > 0) config.fishCount = fc;
+                }
+                // Per-question time (falls back to 30s)
+                if (typeof cfg.question_time !== 'undefined') {
+                    const qt = parseInt(cfg.question_time);
+                    if (!isNaN(qt) && qt > 0) config.questionTime = qt;
+                } else {
+                    config.questionTime = 30;
+                }
+                if (typeof cfg.base_speed !== 'undefined') {
+                    const bs = parseFloat(cfg.base_speed);
+                    if (!isNaN(bs) && bs > 0) config.baseSpeed = bs;
+                }
+                if (typeof cfg.time_limit !== 'undefined') {
+                    const tl = parseInt(cfg.time_limit);
+                    if (!isNaN(tl) && tl > 0) config.timeLimit = tl;
+                }
+                if (typeof cfg.show_explanations !== 'undefined') {
+                    config.showExplanations = !!cfg.show_explanations;
+                }
+                if (typeof cfg.randomize_questions !== 'undefined') {
+                    config.randomizeQuestions = !!cfg.randomize_questions;
+                }
+                if (typeof cfg.export_mode !== 'undefined') {
+                    config.exportMode = String(cfg.export_mode || 'student').toLowerCase() === 'teaching' ? 'teaching' : 'student';
+                }
+            } catch (e) {}
+            teachingMode = config.exportMode === 'teaching';
+            
+            // Set background
+            const bgImageParam = urlParams.get('background');
+            const bgImage = bgImageParam || 'background_seaweed_a.png';
+            try {
+                const gameDataElement = document.getElementById('game-data');
+                const gameData = gameDataElement ? JSON.parse(gameDataElement.textContent) : null;
+                const bgBase64 = gameData && gameData.game_config ? gameData.game_config.background_image_base64 : null;
+                if (bgBase64 && typeof bgBase64 === 'string' && bgBase64.length > 50) {
+                    background.src = bgBase64.startsWith('data:') ? bgBase64 : `data:image/png;base64,${bgBase64}`;
+                    customBackgroundSet = true;
+                } else {
+                    setSceneImage(background, bgImage);
+                    customBackgroundSet = !!bgImageParam;
+                }
+            } catch (e) {
+                setSceneImage(background, bgImage);
+                customBackgroundSet = !!bgImageParam;
+            }
+            
+            // Set audio
+            try {
+                const gameDataElement = document.getElementById('game-data');
+                const gameData = gameDataElement ? JSON.parse(gameDataElement.textContent) : null;
+                const cfg = gameData ? (gameData.game_config || {}) : {};
+                // Cute effects toggle
+                window.enableCute = !!cfg.cute_effects;
+                // Fish size mapping
+                window.fishSizeSetting = (cfg.fish_size || 'Vừa');
+                const bgm64 = cfg.bgm_base64;
+                const click64 = cfg.click_sound_base64;
+                const correct64 = cfg.correct_sound_base64;
+                const wrong64 = cfg.wrong_sound_base64;
+                bgm.src = (bgm64 && bgm64.length > 50) ? (bgm64.startsWith('data:') ? bgm64 : `data:audio/mpeg;base64,${bgm64}`) : '../sound/background.mp3';
+                clickSound.src = (click64 && click64.length > 20) ? (click64.startsWith('data:') ? click64 : `data:audio/wav;base64,${click64}`) : '../sound/click.wav';
+                correctSound.src = (correct64 && correct64.length > 20) ? (correct64.startsWith('data:') ? correct64 : `data:audio/wav;base64,${correct64}`) : '../sound/correct.wav';
+                wrongSound.src = (wrong64 && wrong64.length > 20) ? (wrong64.startsWith('data:') ? wrong64 : `data:audio/wav;base64,${wrong64}`) : '../sound/wrong.wav';
+                initFeedbackSoundPools(cfg.feedback_sound_pools || {});
+            } catch (e) {
+                bgm.src = '../sound/background.mp3';
+                clickSound.src = '../sound/click.wav';
+                correctSound.src = '../sound/correct.wav';
+                wrongSound.src = '../sound/wrong.wav';
+                initFeedbackSoundPools(null);
+            }
+            
+            // Set volume
+            bgm.volume = 0.5;
+            
+            // Load questions from data attribute or use sample questions
+            try {
+                const gameDataElement = document.getElementById('game-data');
+                if (gameDataElement) {
+                    const gameData = JSON.parse(gameDataElement.textContent);
+                    const rawQ = gameData.questions || [];
+                    questions = rawQ.map(q => {
+                        const src = (q && typeof q === 'object') ? q : {};
+                        const normalizedType = normalizeFishingQuestionType(src);
+                        const textAnswers = collectFishingTextAnswers(src);
+                        return {
+                            ...src,
+                            question: getFishingQuestionText(src),
+                            options: src.options || src.choices || [],
+                            correctAnswer: (typeof src.correctAnswer !== 'undefined') ? src.correctAnswer : (typeof src.correct_answer !== 'undefined' ? src.correct_answer : (typeof src.correctIndex !== 'undefined' ? src.correctIndex : 0)),
+                            explanation: src.explanation || src.feedback || '',
+                            type: normalizedType,
+                            answers: textAnswers,
+                            correct_answers: textAnswers,
+                            match_pairs: src.match_pairs || src.pairs || src.matchPairs || []
+                        };
+                    });
+                    
+                    // If no questions provided, create some sample questions
+                    if (questions.length === 0) {
+                        questions = [
+                            {
+                                question: "What is 2 + 2?",
+                                options: ["3", "4", "5"],
+                                correctAnswer: 1,
+                                explanation: "2 + 2 = 4"
+                            },
+                            {
+                                question: "What is the capital of France?",
+                                options: ["London", "Berlin", "Paris"],
+                                correctAnswer: 2,
+                                explanation: "The capital of France is Paris"
+                            }
+                        ];
+                    }
+                    
+                    // Randomize questions if enabled
+                    if (config.randomizeQuestions) {
+                        shuffleArray(questions);
+                    }
+                    
+                    // Limit number of questions to fish count
+                    questions = questions.slice(0, Math.min(questions.length, Math.max(1, config.fishCount)));
+
+                    // Shuffle options for each question while keeping correctAnswer in sync
+                    questions.forEach(q => {
+                        try {
+                            if (!q || !Array.isArray(q.options) || q.options.length < 2) return;
+                            const original = q.options.map((opt, idx) => ({ opt, idx }));
+                            shuffleArray(original);
+                            q.options = original.map(o => o.opt);
+                            if (typeof q.correctAnswer === 'number' &&
+                                q.correctAnswer >= 0 &&
+                                q.correctAnswer < original.length) {
+                                const mappedIndex = original.findIndex(o => o.idx === q.correctAnswer);
+                                if (mappedIndex >= 0) q.correctAnswer = mappedIndex;
+                            }
+                        } catch (e) {}
+                    });
+                }
+            } catch (e) {
+                console.error("Error loading game data:", e);
+            }
+            
+            // Load fish sprites from embedded game data if available, else fall back
+            try {
+                const gameDataElement = document.getElementById('game-data');
+                if (gameDataElement) {
+                    const gameData = JSON.parse(gameDataElement.textContent);
+                    const objs = (gameData.game_config && Array.isArray(gameData.game_config.fish_objects)) ? gameData.game_config.fish_objects : [];
+                    if (objs.length) {
+                        fishSprites = objs.map(f => ({
+                            normal: f.sprite_base64 || f.sprite || defaultAssetPath('fish_blue.png'),
+                            skeleton: f.wrong_sprite_base64 || f.wrong_sprite || defaultAssetPath('fish_blue_skeleton.png')
+                        }));
+                    }
+                    const tiny64 = (gameData.game_config && Array.isArray(gameData.game_config.tiny_fish_base64)) ? gameData.game_config.tiny_fish_base64 : [];
+                    window.tinyFishSources = Array.isArray(tiny64) && tiny64.length ? tiny64 : [];
+                }
+            } catch (e) {}
+            if (!fishSprites || fishSprites.length === 0) {
+                const fishTypes = ['blue', 'green', 'pink', 'orange'];
+                fishSprites = fishTypes.map(type => ({
+                    normal: defaultAssetPath(`fish_${type}.png`),
+                    skeleton: defaultAssetPath(`fish_${type}_skeleton.png`)
+                }));
+            }
+            if (!window.tinyFishSources || window.tinyFishSources.length === 0) {
+                window.tinyFishSources = fishSprites.map(s => s.normal);
+            }
+        }
+
+        let elapsedTime = 0;
+
+        function normalizeFishingQuestionType(question) {
+            try {
+                const raw = String((question && (question.type || question.question_type || question.q_type || question.kind)) || '').trim().toLowerCase();
+                if (raw === 'fillblank' || raw === 'cloze' || raw === 'dien_cho_trong' || raw === 'điền_chỗ_trống') return 'fill_blank';
+                if (raw === 'shortanswer' || raw === 'essay' || raw === 'tu_luan' || raw === 'tự_luận') return 'short_answer';
+                if (raw === 'truefalse' || raw === 'boolean') return 'true_false';
+                if (raw) return raw;
+                const hasPairs = !!(question && ((Array.isArray(question.match_pairs) && question.match_pairs.length) || (Array.isArray(question.pairs) && question.pairs.length) || (Array.isArray(question.matchPairs) && question.matchPairs.length)));
+                const hasTextAnswers = !!(question && ((Array.isArray(question.correct_answers) && question.correct_answers.length) || (Array.isArray(question.answers) && question.answers.length) || (question.correct_answer !== undefined && question.correct_answer !== null && String(question.correct_answer).trim() !== '') || (question.correctAnswer !== undefined && question.correctAnswer !== null && String(question.correctAnswer).trim() !== '')));
+                const hasOptions = !!(question && ((Array.isArray(question.options) && question.options.length) || (Array.isArray(question.choices) && question.choices.length)));
+                if (hasPairs) return 'matching';
+                if (hasTextAnswers && !hasOptions) return 'fill_blank';
+                return 'multiple_choice';
+            } catch (e) {
+                return 'multiple_choice';
+            }
+        }
+
+        function getFishingQuestionText(question) {
+            try {
+                const raw = question && (question.question !== undefined && question.question !== null ? question.question : question.text);
+                return String(raw == null ? '' : raw);
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function collectFishingTextAnswers(question) {
+            try {
+                const collected = [];
+                const pushValues = (value) => {
+                    if (Array.isArray(value)) {
+                        value.forEach(item => pushValues(item));
+                        return;
+                    }
+                    const text = String(value == null ? '' : value).trim();
+                    if (text) collected.push(text);
+                };
+                pushValues(question && question.correct_answers);
+                pushValues(question && question.answers);
+                pushValues(question && question.answer_list);
+                pushValues(question && question.correct_answer);
+                pushValues(question && question.correctAnswer);
+                return Array.from(new Set(collected));
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // Initialize the game
+        function initGame() {
+            // Reset game state
+            score = 0;
+            elapsedTime = 0;
+            timeLeft = 0;
+            gameActive = true;
+            currentQuestionIndex = -1;
+            activeFish = [];
+            bubbles = [];
+            seaweedsStatic = [];
+            seaweedsFloating = [];
+            document.querySelectorAll('.seaweed').forEach(el => el.remove());
+            
+            // Reset UI
+            updateScore();
+            updateTimer();
+            gameOverScreen.style.display = 'none';
+            
+            // Reset caught fish HUD
+            try {
+                const hud = document.getElementById('caught-fish-hud');
+                const list = document.getElementById('caught-fish-list');
+                const countSpan = document.getElementById('caught-count');
+                if (list) list.innerHTML = '';
+                if (countSpan) countSpan.textContent = '0';
+                if (hud) hud.style.display = 'none';
+            } catch(e){}
+            
+            if (!customBackgroundSet) {
+                applyRandomBackground();
+            }
+            initBubbles();
+            
+            createSeaweed();
+            createDecorations();
+            createJellies();
+            createAmbientCreatures();
+            // Create fish
+            createFish();
+            try {
+                const hud = document.getElementById('hud-debug');
+                hud.style.display = 'block';
+                hud.textContent = `seaweed: ${seaweedsStatic.length + seaweedsFloating.length}, fish: ${activeFish.length}, jellies: ${jellies.length}`;
+            } catch(e){}
+            
+            // Start game loop
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+            
+            // Start timer
+            clearInterval(timerInterval);
+            timerInterval = setInterval(updateGame, 1000);
+        }
+
+        // Game loop
+        function gameLoop(timestamp) {
+            if (!gameActive) return;
+            
+            const deltaTime = (timestamp - lastTime) / 1000; // Convert to seconds
+            lastTime = timestamp;
+            
+            // Update fish positions
+            updateFish(deltaTime);
+            
+            // Update bubbles
+            updateBubbles(deltaTime);
+            updateBackgroundFish(deltaTime);
+            updateSeaweed(deltaTime);
+            updateTinyFish(deltaTime);
+            updateJellies(deltaTime);
+            updateAmbient(deltaTime);
+            
+            // Create new bubbles occasionally
+            if (Math.random() < 0.02) {
+                createBubble();
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+
+        function applyRandomBackground() {
+            background.style.opacity = '0.0';
+            createSeabed();
+            createBackgroundFish();
+        }
+
+        function createSeabed() {
+            let container = document.getElementById('terrain-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'terrain-container';
+                (layerBottom || gameContainer).appendChild(container);
+            }
+            container.innerHTML = '';
+            
+            const w = gameContainer.clientWidth || window.innerWidth;
+            
+            // SVG seabed hills for smooth natural curves matching Kenney platformer ocean style
+            const svgNS = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(svgNS, "svg");
+            svg.setAttribute("width", "100%");
+            svg.setAttribute("height", "110");
+            svg.setAttribute("viewBox", `0 0 ${w} 110`);
+            svg.setAttribute("preserveAspectRatio", "none");
+            svg.style.position = "absolute";
+            svg.style.bottom = "0";
+            svg.style.left = "0";
+            svg.style.zIndex = "4";
+
+            // Dirt Back Curve
+            const dirtPath = document.createElementNS(svgNS, "path");
+            dirtPath.setAttribute("d", `M 0 110 L 0 55 Q ${w*0.25} 35, ${w*0.5} 65 T ${w} 45 L ${w} 110 Z`);
+            dirtPath.setAttribute("fill", "url(#dirtGrad)");
+
+            // Sand Front Curve
+            const sandPath = document.createElementNS(svgNS, "path");
+            sandPath.setAttribute("d", `M 0 110 L 0 45 Q ${w*0.3} 65, ${w*0.6} 38 T ${w} 50 L ${w} 110 Z`);
+            sandPath.setAttribute("fill", "url(#sandGrad)");
+
+            // Defs for gradients
+            const defs = document.createElementNS(svgNS, "defs");
+            defs.innerHTML = `
+                <linearGradient id="dirtGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#8c582d"/>
+                    <stop offset="100%" stop-color="#543116"/>
+                </linearGradient>
+                <linearGradient id="sandGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#f2cd7e"/>
+                    <stop offset="35%" stop-color="#dfb15b"/>
+                    <stop offset="100%" stop-color="#b88330"/>
+                </linearGradient>
+            `;
+            svg.appendChild(defs);
+            svg.appendChild(dirtPath);
+            svg.appendChild(sandPath);
+            container.appendChild(svg);
+
+            // Overlay row of Kenney sand tile textures along top sand line
+            const sandRow = document.createElement('div');
+            sandRow.style.position = 'absolute';
+            sandRow.style.left = '0';
+            sandRow.style.bottom = '32px';
+            sandRow.style.width = '100%';
+            sandRow.style.height = '60px';
+            sandRow.style.display = 'flex';
+            sandRow.style.zIndex = '5';
+            sandRow.style.opacity = '0.9';
+
+            const tileWidth = 68;
+            const numTiles = Math.ceil(w / tileWidth) + 1;
+            const sandTiles = ['terrain_sand_top_a.png', 'terrain_sand_top_b.png', 'terrain_sand_top_c.png', 'terrain_sand_top_d.png', 'terrain_sand_top_e.png', 'terrain_sand_top_f.png'];
+
+            for (let i = 0; i < numTiles; i++) {
+                const sImg = document.createElement('img');
+                const sName = sandTiles[i % sandTiles.length];
+                setSceneImage(sImg, sName);
+                sImg.style.width = `${tileWidth}px`;
+                sImg.style.height = '60px';
+                sImg.style.flexShrink = '0';
+                sandRow.appendChild(sImg);
+            }
+            container.appendChild(sandRow);
+        }
+
+        function createTerrain() {
+            createSeabed();
+        }
+
+        function createBackgroundFish() {
+            // Remove existing background fish
+            bgFishObjects.forEach(f => f.element && f.element.remove());
+            bgFishObjects = [];
+            document.querySelectorAll('.bg-fish').forEach(el => el.remove());
+            
+            // Background fish list - Regular fish ONLY (NO SKELETONS, NO EEL!)
+            const bgFishList = [
+                // Green fish school (left side)
+                { src: 'fish_green.png', xRatio: 0.08, yRatio: 0.50, w: 42, speed: 0.22, amp: 14, freq: 0.8 },
+                { src: 'fish_green.png', xRatio: 0.12, yRatio: 0.54, w: 48, speed: 0.25, amp: 16, freq: 0.9 },
+                { src: 'fish_green.png', xRatio: 0.16, yRatio: 0.48, w: 44, speed: 0.20, amp: 12, freq: 0.7 },
+                { src: 'fish_green.png', xRatio: 0.22, yRatio: 0.52, w: 50, speed: 0.28, amp: 18, freq: 1.0 },
+                { src: 'fish_green.png', xRatio: 0.30, yRatio: 0.46, w: 40, speed: 0.23, amp: 11, freq: 0.85 },
+                { src: 'fish_green.png', xRatio: 0.35, yRatio: 0.56, w: 46, speed: 0.21, amp: 15, freq: 0.75 },
+                
+                // Blue fish school (top center)
+                { src: 'fish_blue.png', xRatio: 0.28, yRatio: 0.22, w: 38, speed: 0.30, amp: 12, freq: 1.1 },
+                { src: 'fish_blue.png', xRatio: 0.33, yRatio: 0.16, w: 46, speed: 0.32, amp: 15, freq: 1.0 },
+                { src: 'fish_blue.png', xRatio: 0.40, yRatio: 0.20, w: 52, speed: 0.28, amp: 18, freq: 0.9 },
+                
+                // Orange fish cluster (top left / middle)
+                { src: 'fish_orange.png', xRatio: 0.04, yRatio: 0.08, w: 42, speed: 0.24, amp: 10, freq: 0.8 },
+                { src: 'fish_orange.png', xRatio: 0.49, yRatio: 0.42, w: 45, speed: 0.26, amp: 16, freq: 0.95 },
+                { src: 'fish_orange.png', xRatio: 0.54, yRatio: 0.35, w: 50, speed: 0.22, amp: 14, freq: 0.85 },
+                
+                // Red fish school (right side - swimming left)
+                { src: 'fish_red.png', xRatio: 0.76, yRatio: 0.46, w: 44, speed: -0.26, amp: 16, freq: 0.9 },
+                { src: 'fish_red.png', xRatio: 0.80, yRatio: 0.55, w: 52, speed: -0.22, amp: 18, freq: 0.8 },
+                { src: 'fish_red.png', xRatio: 0.90, yRatio: 0.52, w: 46, speed: -0.28, amp: 14, freq: 1.0 },
+                
+                // Pink fish cluster (lower middle)
+                { src: 'fish_pink.png', xRatio: 0.46, yRatio: 0.68, w: 34, speed: 0.20, amp: 12, freq: 0.75 },
+                { src: 'fish_pink.png', xRatio: 0.52, yRatio: 0.67, w: 38, speed: 0.22, amp: 14, freq: 0.8 },
+                { src: 'fish_pink.png', xRatio: 0.59, yRatio: 0.58, w: 32, speed: 0.24, amp: 11, freq: 0.85 },
+                
+                // Additional background swimmers (grey & brown fish)
+                { src: 'fish_grey.png', xRatio: 0.74, yRatio: 0.14, w: 42, speed: 0.25, amp: 15, freq: 0.9 },
+                { src: 'fish_brown.png', xRatio: 0.68, yRatio: 0.28, w: 40, speed: -0.20, amp: 13, freq: 0.75 }
+            ];
+
+            const w = gameContainer.clientWidth || window.innerWidth;
+            const h = gameContainer.clientHeight || window.innerHeight;
+
+            bgFishList.forEach(item => {
+                const img = document.createElement('img');
+                img.className = 'bg-fish';
+                setSceneImage(img, item.src);
+                img.style.width = `${item.w}px`;
+                img.style.height = 'auto';
+                const x = item.xRatio * w;
+                const y = item.yRatio * h;
+                img.style.left = `${x}px`;
+                img.style.top = `${y}px`;
+                (layerFar || gameContainer).appendChild(img);
+
+                bgFishObjects.push({
+                    element: img,
+                    x: x,
+                    y: y,
+                    startY: y,
+                    speed: item.speed,
+                    amplitude: item.amp || (12 + Math.random() * 8),
+                    frequency: item.freq || (0.7 + Math.random() * 0.4),
+                    secondaryFreq: 1.6 + Math.random() * 0.6,
+                    phase: Math.random() * Math.PI * 2,
+                    time: Math.random() * 100,
+                    width: item.w
+                });
+            });
+        }
+
+        function updateBackgroundFish(deltaTime) {
+            const w = gameContainer.clientWidth || window.innerWidth;
+            bgFishObjects.forEach(fish => {
+                fish.time += deltaTime;
+                const vx = fish.speed * deltaTime * 60;
+                fish.x += vx;
+
+                // Organic wave trajectory combining sine and cosine harmonics
+                const wave1 = Math.sin(fish.time * fish.frequency + fish.phase) * fish.amplitude;
+                const wave2 = Math.cos(fish.time * fish.secondaryFreq + fish.phase * 0.5) * (fish.amplitude * 0.35);
+                const nextY = fish.startY + wave1 + wave2;
+                const vy = nextY - fish.y;
+                fish.y = nextY;
+
+                if (fish.speed > 0 && fish.x > w + 60) {
+                    fish.x = -60;
+                } else if (fish.speed < 0 && fish.x < -60) {
+                    fish.x = w + 60;
+                }
+
+                fish.element.style.left = `${fish.x}px`;
+                fish.element.style.top = `${fish.y}px`;
+                
+                // Dynamic swimming tilt / rotation based on vertical slope
+                const rawAngle = Math.atan2(vy, Math.abs(vx)) * (180 / Math.PI) * 0.65;
+                const clampedAngle = Math.max(-16, Math.min(16, rawAngle));
+                const flipScale = fish.speed > 0 ? 1 : -1;
+                fish.element.style.transform = `scaleX(${flipScale}) rotate(${fish.speed > 0 ? clampedAngle : -clampedAngle}deg)`;
+            });
+        }
+
+        function createSeaweed() {
+            const containerWidth = gameContainer.clientWidth;
+            seaweedsStatic = [];
+            document.querySelectorAll('.seaweed, .bg-seaweed').forEach(el => el.remove());
+            
+            // 1. Background layer dark seaweeds (tall underwater background flora)
+            const bgSeaweedSpecs = [
+                { src: 'background_seaweed_a.png', xRatio: 0.08, w: 140, h: 260 },
+                { src: 'background_seaweed_b.png', xRatio: 0.18, w: 125, h: 240 },
+                { src: 'background_seaweed_c.png', xRatio: 0.48, w: 150, h: 270 },
+                { src: 'background_seaweed_d.png', xRatio: 0.58, w: 135, h: 250 },
+                { src: 'background_seaweed_e.png', xRatio: 0.82, w: 155, h: 285 },
+                { src: 'background_seaweed_f.png', xRatio: 0.90, w: 130, h: 235 }
+            ];
+
+            bgSeaweedSpecs.forEach(spec => {
+                const img = document.createElement('img');
+                img.className = 'bg-seaweed';
+                setSceneImage(img, spec.src);
+                img.style.position = 'absolute';
+                img.style.pointerEvents = 'none';
+                img.style.zIndex = '3';
+                img.style.opacity = '0.75';
+                img.style.width = `${spec.w}px`;
+                img.style.height = `${spec.h}px`;
+                img.style.left = `${spec.xRatio * containerWidth}px`;
+                img.style.bottom = '22px';
+                (layerFar || gameContainer).appendChild(img);
+            });
+
+            // 2. Foreground Cohesive Coral Reef Clusters (Very Tall & High-Low Varied Reefs)
+            const seaweedSpecs = [
+                // Left Coral Reef Cluster
+                { src: 'seaweed_pink_a.png', xRatio: 0.05, w: 125, h: 220, z: 9, b: 18 },
+                { src: 'seaweed_green_a.png', xRatio: 0.10, w: 110, h: 280, z: 8, b: 20 },
+                { src: 'seaweed_grass_a.png', xRatio: 0.14, w: 90, h: 250, z: 10, b: 22 },
+                { src: 'seaweed_pink_b.png', xRatio: 0.19, w: 105, h: 180, z: 11, b: 18 },
+                
+                // Center Coral Reef Cluster
+                { src: 'seaweed_green_b.png', xRatio: 0.51, w: 115, h: 260, z: 8, b: 22 },
+                { src: 'seaweed_orange_a.png', xRatio: 0.56, w: 90, h: 110, z: 10, b: 20 },
+                { src: 'seaweed_grass_b.png', xRatio: 0.59, w: 85, h: 210, z: 9, b: 20 },
+                
+                // Right Coral Reef Cluster
+                { src: 'seaweed_green_c.png', xRatio: 0.75, w: 120, h: 255, z: 9, b: 20 },
+                { src: 'seaweed_orange_b.png', xRatio: 0.78, w: 88, h: 105, z: 11, b: 18 },
+                { src: 'seaweed_pink_c.png', xRatio: 0.82, w: 130, h: 230, z: 10, b: 20 },
+                { src: 'seaweed_pink_d.png', xRatio: 0.87, w: 135, h: 275, z: 8, b: 22 }
+            ];
+
+            seaweedSpecs.forEach(spec => {
+                const img = document.createElement('img');
+                img.className = 'seaweed';
+                setSceneImage(img, spec.src);
+                img.style.position = 'absolute';
+                img.style.pointerEvents = 'none';
+                img.style.zIndex = `${spec.z || 8}`;
+                img.style.width = `${spec.w}px`;
+                img.style.height = `${spec.h}px`;
+                img.style.left = `${spec.xRatio * containerWidth}px`;
+                img.style.bottom = `${spec.b || 18}px`;
+                (layerBottom || gameContainer).appendChild(img);
+                seaweedsStatic.push({ element: img });
+            });
+        }
+
+        function createDecorations() {
+            const containerWidth = gameContainer.clientWidth;
+            document.querySelectorAll('.rock').forEach(el => el.remove());
+            const rockSpecs = [
+                { src: 'rock_a.png', xRatio: 0.13, w: 65, h: 44, z: 12, b: 20 },
+                { src: 'rock_b.png', xRatio: 0.46, w: 72, h: 48, z: 11, b: 20 },
+                { src: 'background_rock_a.png', xRatio: 0.85, w: 60, h: 42, z: 12, b: 22 }
+            ];
+            rockSpecs.forEach(spec => {
+                const img = document.createElement('img');
+                img.className = 'decor rock';
+                setSceneImage(img, spec.src);
+                img.style.position = 'absolute';
+                img.style.pointerEvents = 'none';
+                img.style.zIndex = `${spec.z || 11}`;
+                img.style.width = `${spec.w}px`;
+                img.style.height = `${spec.h}px`;
+                img.style.left = `${spec.xRatio * containerWidth}px`;
+                img.style.bottom = `${spec.b || 20}px`;
+                (layerBottom || gameContainer).appendChild(img);
+            });
+        }
+
+        function createFishSchool() {
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
+            const n = 8 + Math.floor(Math.random()*8);
+            tinyFish = [];
+            for (let i=0;i<n;i++) {
+                const img = document.createElement('img');
+                img.className = 'tiny-fish';
+                const src = (window.tinyFishSources && window.tinyFishSources.length) ? window.tinyFishSources[Math.floor(Math.random()*window.tinyFishSources.length)] : defaultAssetPath('fish_blue.png');
+                setImageSource(img, [
+                    src,
+                    sceneAssetMap[inferAssetName(src)],
+                    defaultAssetPath(inferAssetName(src) || 'fish_blue.png'),
+                    localAssetPath(inferAssetName(src) || 'fish_blue.png')
+                ]);
+                const w = 22 + Math.random()*12; const h = w*0.5;
+                img.style.width = `${w}px`; img.style.height = `${h}px`;
+                const fromLeft = Math.random()>0.5; const x = fromLeft? -w : containerWidth;
+                const y = 60 + Math.random()*(containerHeight*0.45);
+                const speed = (0.2 + Math.random()*0.2)*(Math.random()>0.5?1:-1);
+                const amp = 8 + Math.random()*12; const freq = 0.3 + Math.random()*0.6;
+                const fobj = { element: img, x, y, startY:y, w, h, speed: fromLeft? Math.abs(speed): -Math.abs(speed), amp, freq, time: Math.random()*100 };
+                (layerFar || gameContainer).appendChild(img);
+                tinyFish.push(fobj);
+            }
+        }
+
+        function updateTinyFish(deltaTime) {
+            const containerWidth = gameContainer.clientWidth;
+            tinyFish.forEach(f => {
+                f.time += deltaTime;
+                f.x += f.speed * deltaTime * 60;
+                f.y = f.startY + Math.sin(f.time * f.freq) * f.amp;
+                f.element.style.left = `${f.x}px`;
+                f.element.style.top = `${f.y}px`;
+                f.element.style.transform = f.speed>0? 'scaleX(1)': 'scaleX(-1)';
+                if ((f.speed>0 && f.x>containerWidth+f.w) || (f.speed<0 && f.x<-f.w)) {
+                    f.x = f.speed>0? -f.w : containerWidth+f.w;
+                    f.startY = 60 + Math.random()*(gameContainer.clientHeight*0.45);
+                }
+            });
+        }
+
+        function createJellies() {
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
+            const n = 2 + Math.floor(Math.random()*3);
+            jellies = [];
+            for (let i=0;i<n;i++) {
+                const j = document.createElement('div');
+                j.className = 'jelly';
+                const x = Math.random()*(containerWidth-60);
+                const y = 80 + Math.random()*(containerHeight*0.5);
+                j.style.left = `${x}px`; j.style.top = `${y}px`;
+                (layerMid || gameContainer).appendChild(j);
+                jellies.push({ element:j, x, y, baseY:y, time: Math.random()*100, amp: 10+Math.random()*14, sway: 6+Math.random()*10, freq: 0.4+Math.random()*0.6 });
+            }
+        }
+
+        function updateJellies(deltaTime) {
+            jellies.forEach(j => {
+                j.time += deltaTime;
+                const dy = Math.sin(j.time * j.freq) * j.amp;
+                const dx = Math.sin(j.time * (j.freq*0.7)) * j.sway;
+                j.element.style.top = `${j.baseY + dy}px`;
+                j.element.style.left = `${j.x + dx}px`;
+            });
+        }
+
+        function createAmbientCreatures() {
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
+            ambient = [];
+            let animals = [];
+            try {
+                const gameData = JSON.parse(document.getElementById('game-data').textContent);
+                animals = (gameData.game_config && Array.isArray(gameData.game_config.animals_base64)) ? gameData.game_config.animals_base64 : [];
+            } catch(e) {}
+            const count = 6 + Math.floor(Math.random()*6);
+            for (let i=0;i<count;i++) {
+                let el;
+                if (animals.length) {
+                    el = document.createElement('img');
+                    el.className = 'ambient';
+                    el.src = animals[Math.floor(Math.random()*animals.length)];
+                    el.style.width = (10 + Math.random()*12) + 'px';
+                    el.style.height = 'auto';
+                } else {
+                    el = document.createElement('div');
+                    el.className = Math.random()<0.5 ? 'ambient star' : 'ambient dot';
+                }
+                const x = Math.random()*containerWidth;
+                const y = 40 + Math.random()*(containerHeight*0.6);
+                el.style.left = x+'px'; el.style.top = y+'px';
+                (layerFar || gameContainer).appendChild(el);
+                ambient.push({ element: el, x, y, baseY:y, time: Math.random()*100, amp: 6+Math.random()*10, sway: 8+Math.random()*12, speed: (0.15+Math.random()*0.15)*(Math.random()>0.5?1:-1) });
+            }
+        }
+
+        function updateAmbient(deltaTime) {
+            const containerWidth = gameContainer.clientWidth;
+            ambient.forEach(a => {
+                a.time += deltaTime;
+                a.x += a.speed * deltaTime * 60;
+                a.y = a.baseY + Math.sin(a.time*0.8) * a.amp;
+                a.element.style.left = a.x+'px';
+                a.element.style.top = a.y+'px';
+                if ((a.speed>0 && a.x>containerWidth+20) || (a.speed<0 && a.x<-20)) {
+                    a.x = a.speed>0? -20 : containerWidth+20;
+                }
+            });
+        }
+
+        function updateSeaweed(deltaTime) {
+            seaweedsFloating.forEach(sw => {
+                sw.time += deltaTime;
+                const dy = Math.sin(sw.time * sw.frequency) * sw.amplitude;
+                const dx = Math.sin(sw.time * (sw.frequency * 0.8)) * sw.sway;
+                sw.y = sw.baseY + dy;
+                sw.x = sw.baseX + dx;
+                sw.element.style.top = `${sw.y}px`;
+                sw.element.style.left = `${sw.x}px`;
+            });
+        }
+
+        // Update game state
+        function updateGame() {
+            if (!gameActive) return;
+            
+            timeLeft--;
+            updateTimer();
+            
+            if (timeLeft <= 0) {
+                endGame();
+            }
+        }
+
+        // Create fish elements
+        function createFish() {
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
+            
+            // Clear existing fish
+            document.querySelectorAll('.fish').forEach(fish => fish.remove());
+            activeFish = [];
+            
+            // Create new fish
+            const fishCount = Math.min(Math.max(questions.length, 1), config.fishCount);
+            
+            for (let i = 0; i < fishCount; i++) {
+                const fishData = fishSprites[i % fishSprites.length];
+                const fish = document.createElement('img');
+                fish.className = 'fish';
+                setImageSource(fish, [
+                    fishData.normal,
+                    sceneAssetMap[inferAssetName(fishData.normal)],
+                    defaultAssetPath(inferAssetName(fishData.normal)),
+                    localAssetPath(inferAssetName(fishData.normal))
+                ]);
+                
+                // Size: Make clickable question fish PROMINENT & LARGE (130px - 175px)
+                let minW = 130, maxW = 175;
+                const fs = (window.fishSizeSetting || 'Vừa').toLowerCase();
+                if (fs.includes('nhỏ')) { minW = 90; maxW = 120; }
+                else if (fs.includes('lớn')) { minW = 160; maxW = 210; }
+                let width = minW + Math.random() * (maxW - minW);
+                width = Math.max(minW, Math.min(maxW, width));
+                const height = width * 0.52;
+                fish.style.width = `${width}px`;
+                fish.style.height = `${height}px`;
+                
+                // Random position (start from left or right)
+                const startFromLeft = Math.random() > 0.5;
+                const x = startFromLeft ? -width : containerWidth;
+                const minY = 20;
+                const maxY = Math.max(minY + height, containerHeight - (height + 20));
+                const y = minY + Math.random() * Math.max(20, (maxY - minY));
+                
+                // Random speed and movement pattern
+                const speed = (0.32 + Math.random() * 0.26) * config.baseSpeed;
+                const amplitude = 12 + Math.random() * 18; // Vertical movement range
+                const frequency = 0.28 + Math.random() * 0.34; // Smoother vertical movement
+                
+                // Store fish data
+                const fishObj = {
+                    element: fish,
+                    x,
+                    y,
+                    startY: y,
+                    width,
+                    height,
+                    speed: startFromLeft ? speed : -speed,
+                    amplitude,
+                    frequency,
+                    time: Math.random() * 100,
+                    normalSprite: fishData.normal,
+                    skeletonSprite: fishData.skeleton,
+                    questionIndex: i % questions.length,
+                    rotation: 0,
+                    turnCooldown: 1.6 + Math.random() * 1.2
+                };
+                
+                // Set initial position and direction
+                updateFishElement(fishObj);
+                
+                // Add click event with event details for water splash effect
+                fish.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    onFishClick(fishObj, e);
+                });
+                
+                // Add to DOM and active fish array
+                gameContainer.appendChild(fish);
+                activeFish.push(fishObj);
+            }
+        }
+
+        // Movement helpers
+        function swimR(fish, deltaTime) {
+            fish.x += Math.abs(fish.speed) * deltaTime * 60;
+        }
+        function swimL(fish, deltaTime) {
+            fish.x -= Math.abs(fish.speed) * deltaTime * 60;
+        }
+
+        // Update fish positions
+        function updateFish(deltaTime) {
+            const containerWidth = gameContainer.clientWidth;
+            const containerHeight = gameContainer.clientHeight;
+            
+            activeFish.forEach(fish => {
+                if (!fish.caught) {
+                    if (typeof fish.turnCooldown !== 'number') fish.turnCooldown = 0;
+                    fish.turnCooldown = Math.max(0, fish.turnCooldown - deltaTime);
+                    // Update position
+                    if (fish.speed > 0) {
+                        swimR(fish, deltaTime);
+                    } else {
+                        swimL(fish, deltaTime);
+                    }
+                    fish.time += deltaTime;
+                    
+                    // Update vertical position with sine wave
+                    fish.y = fish.startY + Math.sin(fish.time * fish.frequency) * fish.amplitude;
+                    
+                    // BOUNDARY LOGIC: Turn around randomly when reaching screen edges!
+                    const edgeMargin = 24;
+                    if (fish.speed > 0 && fish.x >= containerWidth - fish.width - edgeMargin) {
+                        fish.speed = -Math.abs(fish.speed);
+                        fish.x = containerWidth - fish.width - edgeMargin;
+                        const minY = 20;
+                        const maxY = Math.max(minY + fish.height, containerHeight - (fish.height + 20));
+                        fish.startY = minY + Math.random() * Math.max(20, (maxY - minY));
+                        fish.frequency = 0.25 + Math.random() * 0.30;
+                        fish.turnCooldown = 2.6 + Math.random() * 1.4;
+                    } else if (fish.speed < 0 && fish.x <= edgeMargin) {
+                        fish.speed = Math.abs(fish.speed);
+                        fish.x = edgeMargin;
+                        const minY = 20;
+                        const maxY = Math.max(minY + fish.height, containerHeight - (fish.height + 20));
+                        fish.startY = minY + Math.random() * Math.max(20, (maxY - minY));
+                        fish.frequency = 0.25 + Math.random() * 0.30;
+                        fish.turnCooldown = 2.6 + Math.random() * 1.4;
+                    }
+                    
+                    updateFishElement(fish);
+                    // Occasionally emit tiny bubble near fish mouth
+                    if (Math.random() < 0.02) {
+                        spawnTinyBubble(fish.x + (fish.speed>0?fish.width-8:8), fish.y + fish.height*0.35);
+                    }
+                } else if (fish.skeleton) {
+                    // Handle sinking skeleton
+                    fish.y += 2; // Sink speed
+                    fish.rotation += fish.sinkRotation;
+                    updateFishElement(fish);
+                    
+                    // Remove if off screen
+                    if (fish.y > containerHeight + fish.height) {
+                        fish.element.remove();
+                        fish.dead = true;
+                    }
+                }
+            });
+            
+            // Remove dead fish from active array
+            activeFish = activeFish.filter(fish => !fish.dead);
+            
+            // Check if all fish have been clicked and processed
+            const unansweredFish = activeFish.filter(f => !f.caught);
+            if (activeFish.length === 0 && gameActive) {
+                endGame();
+            }
+        }
+
+        // Main game timer function called every second
+        function updateGame() {
+            if (!gameActive) return;
+            elapsedTime += 1;
+            timeLeft = elapsedTime;
+            updateTimer();
+
+            // Only end game when ALL question fish are answered
+            if (activeFish.length > 0) {
+                const unansweredCount = activeFish.filter(f => !f.caught).length;
+                if (unansweredCount === 0) {
+                    const sinkingSkeletons = activeFish.filter(f => f.skeleton && !f.dead).length;
+                    if (sinkingSkeletons === 0) {
+                        endGame();
+                    }
+                }
+            }
+        }
+
+        // Update fish DOM element
+        function updateFishElement(fish) {
+            fish.element.style.left = `${fish.x}px`;
+            fish.element.style.top = `${fish.y}px`;
+            
+            // Flip fish based on direction
+            if (fish.speed > 0) {
+                fish.element.style.transform = 'scaleX(1)';
+            } else {
+                fish.element.style.transform = 'scaleX(-1)';
+            }
+            
+            // Apply rotation if sinking
+            if (fish.skeleton) {
+                fish.element.style.transform += ` rotate(${fish.rotation}deg)`;
+            }
+            // Subtle tilt based on vertical motion
+            try {
+                const tilt = Math.max(-8, Math.min(8, (fish.y - fish.startY) * 0.05));
+                fish.element.style.transform += ` rotate(${tilt}deg)`;
+            } catch(e){}
+        }
+
+        // Create water splash animation effect at click coordinates
+        function createWaterSplash(x, y, isCatch = true, label = "Bắt trúng!") {
+            const container = gameContainer || document.body;
+            const containerRect = container.getBoundingClientRect();
+            
+            const relX = x - containerRect.left;
+            const relY = y - containerRect.top;
+
+            // 1. Outer Ring
+            const ring = document.createElement('div');
+            ring.className = 'splash-ring';
+            const size = isCatch ? 75 : 55;
+            ring.style.width = `${size}px`;
+            ring.style.height = `${size}px`;
+            ring.style.left = `${relX}px`;
+            ring.style.top = `${relY}px`;
+            container.appendChild(ring);
+
+            // 2. Inner Ring
+            const innerRing = document.createElement('div');
+            innerRing.className = 'splash-ring-inner';
+            innerRing.style.width = `${size * 0.7}px`;
+            innerRing.style.height = `${size * 0.7}px`;
+            innerRing.style.left = `${relX}px`;
+            innerRing.style.top = `${relY}px`;
+            container.appendChild(innerRing);
+
+            // 3. Splash particles bursting radially outward
+            const particleCount = isCatch ? 10 : 6;
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'splash-particle';
+                const angle = (i / particleCount) * Math.PI * 2 + (Math.random() * 0.2 - 0.1);
+                const distance = (isCatch ? 38 : 24) + Math.random() * 25;
+                const dx = Math.cos(angle) * distance;
+                const dy = Math.sin(angle) * distance - (Math.random() * 10);
+                
+                particle.style.setProperty('--dx', `${dx}px`);
+                particle.style.setProperty('--dy', `${dy}px`);
+                particle.style.left = `${relX}px`;
+                particle.style.top = `${relY}px`;
+                container.appendChild(particle);
+
+                setTimeout(() => particle.remove(), 600);
+            }
+
+            // 4. Catch text badge pop up
+            if (isCatch && label) {
+                const badge = document.createElement('div');
+                badge.className = 'catch-text-badge';
+                badge.textContent = label;
+                badge.style.left = `${relX}px`;
+                badge.style.top = `${relY}px`;
+                container.appendChild(badge);
+                setTimeout(() => badge.remove(), 850);
+            }
+
+            setTimeout(() => {
+                ring.remove();
+                innerRing.remove();
+            }, 700);
+        }
+
+        // Global missed click listener on game container to scare fish on missed clicks
+        if (typeof window !== 'undefined') {
+            window.addEventListener('load', () => {
+                const gc = document.getElementById('game-container');
+                if (gc) {
+                    gc.addEventListener('click', (e) => {
+                        if (!gameActive) return;
+                        if (e.target.closest('#question-panel') || e.target.closest('#score-display') || e.target.closest('#timer') || e.target.closest('#start-overlay') || e.target.closest('#game-over') || e.target.closest('.fish')) {
+                            return;
+                        }
+                        // Missed click water splash
+                        createWaterSplash(e.clientX, e.clientY, false);
+                        playSound(waterSound);
+
+                        // Scare nearby fish
+                        const rect = gc.getBoundingClientRect();
+                        const clickX = e.clientX - rect.left;
+                        const clickY = e.clientY - rect.top;
+
+                        activeFish.forEach(fish => {
+                            if (fish.caught) return;
+                            const fishCenterX = fish.x + fish.width / 2;
+                            const fishCenterY = fish.y + fish.height / 2;
+                            const dist = Math.hypot(fishCenterX - clickX, fishCenterY - clickY);
+
+                            if (dist < 400) {
+                                // Slightly speed fish up instead of flipping direction abruptly
+                                const direction = fish.speed >= 0 ? 1 : -1;
+                                fish.speed = direction * Math.min(Math.abs(fish.speed) * 1.08, config.baseSpeed * 0.78);
+                                const minY = 20;
+                                const maxY = Math.max(minY + fish.height, gc.clientHeight - (fish.height + 20));
+                                fish.startY = minY + Math.random() * Math.max(20, (maxY - minY));
+                                fish.frequency = 0.24 + Math.random() * 0.24;
+
+                                // Spawn panic bubbles
+                                for (let b = 0; b < 3; b++) {
+                                    spawnTinyBubble(fish.x + Math.random() * fish.width, fish.y + Math.random() * fish.height);
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        // Create bubble effect
+        function createBubble(initialY = 0) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            
+            // Size range 6px to 18px
+            const size = 6 + Math.random() * 12;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            
+            const containerW = gameContainer.clientWidth || window.innerWidth;
+            const x = Math.random() * containerW;
+            bubble.style.left = `${x}px`;
+            bubble.style.bottom = `${initialY}px`;
+            
+            const speed = 40 + Math.random() * 60; // Upward pixels per second
+            const wobbleSpeed = 1.2 + Math.random() * 1.8;
+            const wobbleAmp = 8 + Math.random() * 18;
+            const phase = Math.random() * Math.PI * 2;
+            
+            (layerFar || gameContainer).appendChild(bubble);
+            
+            const bObj = {
+                element: bubble,
+                startX: x,
+                x: x,
+                y: initialY,
+                speed,
+                wobbleSpeed,
+                wobbleAmp,
+                phase,
+                time: Math.random() * 10
+            };
+
+            bubbles.push(bObj);
+            return bObj;
+        }
+
+        function initBubbles() {
+            // Remove previous bubbles
+            bubbles.forEach(b => b.element && b.element.remove());
+            bubbles = [];
+            const containerH = gameContainer.clientHeight || window.innerHeight;
+            
+            // Initial pool of 24 floating bubbles distributed vertically
+            for (let i = 0; i < 24; i++) {
+                createBubble(Math.random() * containerH);
+            }
+        }
+
+        function spawnTinyBubble(x, y) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            const size = 4 + Math.random()*4;
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            bubble.style.left = `${x}px`;
+            bubble.style.top = `${y}px`;
+            gameContainer.appendChild(bubble);
+            let life = 0; const duration = 1800; const step = 16;
+            const vx = (Math.random()-0.5)*0.6, vy = -0.8 - Math.random()*0.6;
+            const timer = setInterval(()=>{
+                life += step; const t = life/duration;
+                const nx = x + vx * t * 60; const ny = y + vy * t * 60;
+                bubble.style.left = `${nx}px`; bubble.style.top = `${ny}px`; bubble.style.opacity = `${1-t}`;
+                if (t>=1) { clearInterval(timer); bubble.remove(); }
+            }, step);
+        }
+
+        // Update bubble positions
+        function updateBubbles(deltaTime) {
+            const containerH = gameContainer.clientHeight || window.innerHeight;
+            const containerW = gameContainer.clientWidth || window.innerWidth;
+
+            if (bubbles.length < 24) {
+                createBubble(0);
+            }
+
+            bubbles.forEach(bubble => {
+                bubble.time += deltaTime;
+                bubble.y += bubble.speed * deltaTime;
+                
+                // Gentle swaying wobble
+                bubble.x = bubble.startX + Math.sin(bubble.time * bubble.wobbleSpeed + bubble.phase) * bubble.wobbleAmp;
+                
+                bubble.element.style.bottom = `${bubble.y}px`;
+                bubble.element.style.left = `${bubble.x}px`;
+                
+                // Opacity fades smoothly near top surface
+                const maxH = containerH * 0.92;
+                if (bubble.y > maxH) {
+                    const fade = Math.max(0, (containerH - bubble.y) / (containerH - maxH));
+                    bubble.element.style.opacity = fade;
+                } else {
+                    bubble.element.style.opacity = '0.85';
+                }
+
+                // Recycle bubble when it reaches top surface
+                if (bubble.y > containerH + 20) {
+                    bubble.y = -15;
+                    bubble.startX = Math.random() * containerW;
+                    bubble.x = bubble.startX;
+                    bubble.speed = 40 + Math.random() * 60;
+                    bubble.time = Math.random() * 10;
+                }
+            });
+        }
+
+        // Handle fish click
+        function onFishClick(fish, e) {
+            if (fish.caught) return;
+            
+            // Create water splash ring at click coordinates or fish center
+            let splashX, splashY;
+            if (e && e.clientX) {
+                splashX = e.clientX;
+                splashY = e.clientY;
+            } else {
+                const rect = gameContainer.getBoundingClientRect();
+                splashX = rect.left + fish.x + fish.width / 2;
+                splashY = rect.top + fish.y + fish.height / 2;
+            }
+            createWaterSplash(splashX, splashY, true, "Bắt trúng!");
+
+            // Play click sound
+            playSound(clickSound);
+            
+            // Pause game
+            gameActive = false;
+            
+            // Show question panel with clicked fish
+            showQuestion(fish.questionIndex, fish);
+        }
+
+        // Show question panel
+        function showQuestion(questionIndex, clickedFish = null) {
+            currentQuestionIndex = questionIndex;
+            const question = questions[questionIndex];
+            currentQuestionType = normalizeFishingQuestionType(question);
+            try { questionPanel.classList.toggle('matching-mode', currentQuestionType === 'matching'); } catch (e) {}
+            
+            // Set top-right fish preview badge
+            const fishBadge = document.getElementById('question-fish-badge');
+            const fishImg = document.getElementById('question-fish-img');
+            if (fishBadge && fishImg) {
+                if (clickedFish && clickedFish.element && clickedFish.element.src) {
+                    fishImg.src = clickedFish.element.src;
+                    fishBadge.style.display = 'flex';
+                } else {
+                    fishBadge.style.display = 'none';
+                }
+            }
+
+            try {
+                const img64 = question.image_base64 || '';
+                if (questionImageContainer && questionImage && img64) {
+                    questionImage.src = img64.startsWith('data:') ? img64 : `data:image/png;base64,${img64}`;
+                    questionImageContainer.style.display = 'block';
+                } else if (questionImageContainer && questionImage) {
+                    questionImage.src = '';
+                    questionImageContainer.style.display = 'none';
+                }
+            } catch (e) {}
+            
+            // Clear previous options
+            optionsContainer.innerHTML = '';
+            try { optionsContainer.className = ''; } catch(e) {}
+            try {
+                if (submitBtn) {
+                    submitBtn.style.display = 'none';
+                    submitBtn.textContent = submitBtnDefaultText;
+                    submitBtn.style.backgroundColor = '#10B981';
+                    submitBtn.style.color = '#fff';
+                    submitBtn.onclick = null;
+                }
+            } catch(e) {}
+            try { if (continueBtn) { continueBtn.style.display = 'none'; continueBtn.onclick = null; } } catch(e) {}
+            lastSelectedIndex = null;
+            let questionInlineInput = null;
+            
+            if (currentQuestionType === 'multiple_choice') {
+                try { optionsContainer.className = 'options-grid'; } catch(e) {}
+                (question.options || []).forEach((option, index) => {
+                    const optionElement = createChoiceOption(option, index, () => { handleChoiceAttempt(index); });
+                    optionsContainer.appendChild(optionElement);
+                });
+            } else if (currentQuestionType === 'true_false') {
+                try { optionsContainer.className = 'options-grid'; } catch(e) {}
+                const tfOptions = resolveTrueFalseMeta(question).options;
+                tfOptions.forEach((option, index) => {
+                    const el = createChoiceOption(option, index, ()=>{ handleChoiceAttempt(index); });
+                    optionsContainer.appendChild(el);
+                });
+            } else if (currentQuestionType === 'fill_blank') {
+                try { optionsContainer.className = 'options-stack'; } catch(e) {}
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.id = 'fill-input';
+                input.className = 'text-input inline-blank-input';
+                questionInlineInput = input;
+                try {
+                    if (submitBtn) {
+                        submitBtn.style.display = 'inline-block';
+                        submitBtn.textContent = submitBtnDefaultText;
+                        submitBtn.style.backgroundColor = '#10B981';
+                        submitBtn.style.color = '#fff';
+                        submitBtn.onclick = submitAnswer;
+                    }
+                } catch(e) {}
+                try { input.focus(); } catch(e) {}
+                input.addEventListener('keydown', (e) => { try { if (e.key === 'Enter' && submitBtn) { e.preventDefault(); submitBtn.click(); } } catch(ex) {} });
+            } else if (currentQuestionType === 'short_answer') {
+                try { optionsContainer.className = 'options-stack text-answer-layout'; } catch(e) {}
+                const inputWrap = document.createElement('div');
+                inputWrap.className = 'text-answer-wrap';
+                const input = document.createElement('input');
+                input.type = 'text'; input.id = 'fill-input'; input.className = 'text-input';
+                inputWrap.appendChild(input);
+                optionsContainer.appendChild(inputWrap);
+                try {
+                    if (submitBtn) {
+                        submitBtn.style.display = 'inline-block';
+                        submitBtn.textContent = submitBtnDefaultText;
+                        submitBtn.style.backgroundColor = '#10B981';
+                        submitBtn.style.color = '#fff';
+                        submitBtn.onclick = submitAnswer;
+                    }
+                } catch(e) {}
+                try { input.focus(); } catch(e) {}
+                input.addEventListener('keydown', (e) => { try { if (e.key === 'Enter' && submitBtn) { e.preventDefault(); submitBtn.click(); } } catch(ex) {} });
+            } else if (currentQuestionType === 'matching') {
+                try { optionsContainer.className = 'options-stack'; } catch(e) {}
+                let pairs = question.match_pairs || [];
+                if (!pairs.length && Array.isArray(question.options)) {
+                    pairs = question.options.filter(p=>typeof p==='object' && p && ('left' in p) && ('right' in p));
+                }
+                buildMatchingBoard(pairs);
+                try {
+                    if (submitBtn) {
+                        submitBtn.style.display = teachingMode ? 'none' : 'inline-block';
+                        submitBtn.textContent = submitBtnDefaultText;
+                        submitBtn.style.backgroundColor = '#10B981';
+                        submitBtn.style.color = '#fff';
+                        submitBtn.onclick = () => {
+                            if (!allMatchingPairsConnected()) {
+                                return;
+                            }
+                            let ok = true;
+                            for (let i = 0; i < pairs.length; i++) {
+                                const pickedRightIndex = matchingState ? matchingState.connectionsByLeft[i] : undefined;
+                                const expectedRight = normalizeText((pairs[i] && pairs[i].right) || '');
+                                const pickedRight = normalizeText((pairs[pickedRightIndex] && pairs[pickedRightIndex].right) || '');
+                                if (!expectedRight || pickedRight !== expectedRight) { ok = false; break; }
+                            }
+                            applyResult(ok);
+                        };
+                    }
+                } catch(e) {}
+            } else {
+                // Fallback to multiple choice
+                try { optionsContainer.className = 'options-grid'; } catch(e) {}
+                (question.options || []).forEach((option, index) => {
+                    const optionElement = createChoiceOption(option, index, () => { checkAnswer(index); });
+                    optionsContainer.appendChild(optionElement);
+                });
+            }
+            renderQuestionPrompt(question, questionInlineInput);
+            try { if (questionInlineInput) questionInlineInput.focus(); } catch (e) {}
+            
+            // Show question panel
+            questionPanel.style.display = 'block';
+            try { questionPanel.classList.remove('open'); void questionPanel.offsetWidth; questionPanel.classList.add('open'); } catch(e) {}
+            // Start per-question countdown
+            try {
+                stopQuestionCountdown();
+                const qlim = (typeof question.time_limit !== 'undefined') ? parseInt(question.time_limit) : parseInt(config.questionTime || 30);
+                questionTimeLeft = isNaN(qlim) || qlim <= 0 ? (parseInt(config.questionTime || 30)) : qlim;
+                updateTimer();
+                questionTimer = setInterval(() => {
+                    questionTimeLeft -= 1;
+                    updateTimer();
+                    if (questionTimeLeft <= 0) {
+                        clearInterval(questionTimer);
+                        questionTimer = null;
+                        timeUpQuestion();
+                    }
+                }, 1000);
+                document.getElementById('question-timer').style.display = 'inline-block';
+            } catch(e){}
+            
+            // Hide explanation initially
+            explanationDiv.style.display = 'none';
+            try { explanationDiv.innerHTML = ''; } catch(e) {}
+        }
+
+        function normalizeText(s){ try { return String(s||'').trim().toLowerCase(); } catch(e){ return String(s||''); } }
+
+        function renderQuestionPrompt(question, inlineInput = null) {
+            try {
+                const rawText = getFishingQuestionText(question).trim();
+                questionText.innerHTML = '';
+                questionText.classList.remove('fill-blank-inline');
+                if (currentQuestionType !== 'fill_blank' || !inlineInput) {
+                    questionText.textContent = rawText || '___';
+                    return;
+                }
+                const promptText = rawText || '___';
+                const markerMatch = promptText.match(/_{3,}/);
+                const wrap = document.createElement('span');
+                wrap.className = 'question-inline-wrap';
+                const appendTextPart = (text) => {
+                    if (!text) return;
+                    const span = document.createElement('span');
+                    span.className = 'question-inline-text';
+                    span.textContent = text;
+                    wrap.appendChild(span);
+                };
+                if (markerMatch) {
+                    appendTextPart(promptText.slice(0, markerMatch.index || 0));
+                    wrap.appendChild(inlineInput);
+                    appendTextPart(promptText.slice((markerMatch.index || 0) + markerMatch[0].length));
+                } else {
+                    appendTextPart(promptText);
+                    wrap.appendChild(inlineInput);
+                }
+                questionText.classList.add('fill-blank-inline');
+                questionText.appendChild(wrap);
+            } catch (e) {
+                try { questionText.textContent = getFishingQuestionText(question) || '___'; } catch (inner) {}
+            }
+        }
+
+        function isTrueLikeLabel(value) {
+            const text = normalizeText(value);
+            return ['true', 'đúng', 'dung', 'yes', 'y', '1'].includes(text);
+        }
+
+        function isFalseLikeLabel(value) {
+            const text = normalizeText(value);
+            return ['false', 'sai', 'no', 'n', '0'].includes(text);
+        }
+
+        function resolveBooleanValue(rawValue) {
+            if (typeof rawValue === 'boolean') return rawValue;
+            if (typeof rawValue === 'number') return !!rawValue;
+            const text = normalizeText(rawValue);
+            if (isTrueLikeLabel(text)) return true;
+            if (isFalseLikeLabel(text)) return false;
+            return false;
+        }
+
+        function resolveTrueFalseMeta(question) {
+            const fallbackTrue = '{{ i18n_true }}' || 'Đúng';
+            const fallbackFalse = '{{ i18n_false }}' || 'Sai';
+            let trueLabel = fallbackTrue;
+            let falseLabel = fallbackFalse;
+            try {
+                const rawOptions = Array.isArray(question && question.options) ? question.options : [];
+                rawOptions.forEach(option => {
+                    if (isTrueLikeLabel(option)) trueLabel = String(option);
+                    if (isFalseLikeLabel(option)) falseLabel = String(option);
+                });
+            } catch (e) {}
+            const rawValue = (question && typeof question.correctAnswer !== 'undefined')
+                ? question.correctAnswer
+                : (question ? question.correct_answer : undefined);
+            return {
+                options: [trueLabel, falseLabel],
+                correct: resolveBooleanValue(rawValue),
+            };
+        }
+
+        function resetMatchingState() {
+            matchingState = null;
+        }
+
+        function stopQuestionCountdown() {
+            try {
+                if (questionTimer) {
+                    clearInterval(questionTimer);
+                    questionTimer = null;
+                }
+            } catch (e) {}
+            try { updateTimer(); } catch (e) {}
+        }
+
+        function isSubmitFlowQuestion() {
+            return currentQuestionType === 'matching' || currentQuestionType === 'fill_blank' || currentQuestionType === 'short_answer';
+        }
+
+        function showContinueOnly() {
+            try {
+                if (submitBtn) {
+                    submitBtn.style.display = 'inline-block';
+                    submitBtn.textContent = continueBtn ? continueBtn.textContent : '{{ i18n_next }}';
+                    submitBtn.style.backgroundColor = '#0EA5E9';
+                    submitBtn.style.color = '#fff';
+                    submitBtn.onclick = () => { hideQuestionPanel(); };
+                }
+            } catch (e) {}
+            try {
+                if (continueBtn) {
+                    continueBtn.style.display = 'none';
+                    continueBtn.onclick = null;
+                }
+            } catch (e) {}
+        }
+
+        function getQuestionPairs(question) {
+            try {
+                let pairs = question && question.match_pairs ? question.match_pairs : [];
+                if ((!pairs || !pairs.length) && Array.isArray(question && question.options)) {
+                    pairs = question.options.filter(p => typeof p === 'object' && p && ('left' in p) && ('right' in p));
+                }
+                return Array.isArray(pairs) ? pairs : [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function getQuestionCorrectAnswers(question) {
+            try {
+                if (currentQuestionType === 'matching') {
+                    return getQuestionPairs(question).map(pair => `${pair.left} -> ${pair.right}`).filter(Boolean);
+                }
+                if (currentQuestionType === 'true_false') {
+                    const meta = resolveTrueFalseMeta(question);
+                    return [meta.options[meta.correct ? 0 : 1]].filter(Boolean);
+                }
+                if (currentQuestionType === 'multiple_choice') {
+                    const options = Array.isArray(question && question.options) ? question.options : [];
+                    const correctIndex = getCorrectChoiceIndex(question || {});
+                    return [options[correctIndex]].filter(v => typeof v !== 'undefined' && v !== null && String(v).trim() !== '');
+                }
+                if (currentQuestionType === 'fill_blank' || currentQuestionType === 'short_answer') {
+                    return getTextQuestionAcceptedAnswers(question);
+                }
+                let fallback = question && question.correctAnswer;
+                if (typeof fallback === 'undefined' && question) fallback = question.correct_answer;
+                return [String(fallback || '').trim()].filter(Boolean);
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function getTextQuestionAcceptedAnswers(question) {
+            try {
+                const collected = [];
+                const pushValues = (value) => {
+                    if (Array.isArray(value)) {
+                        value.forEach(item => pushValues(item));
+                        return;
+                    }
+                    const text = String(value || '').trim();
+                    if (text) collected.push(text);
+                };
+                pushValues(question && question.correctAnswer);
+                pushValues(question && question.correct_answer);
+                pushValues(question && question.correct_answers);
+                pushValues(question && question.answers);
+                pushValues(question && question.answer_list);
+                return Array.from(new Set(collected));
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function buildCorrectAnswerNode(question) {
+            const answers = getQuestionCorrectAnswers(question);
+            const container = document.createElement('div');
+            container.className = 'answer-body';
+            if (!answers.length) {
+                container.textContent = '-';
+                return container;
+            }
+            if (answers.length === 1) {
+                container.textContent = answers[0];
+                return container;
+            }
+            const list = document.createElement('div');
+            list.className = 'answer-list';
+            answers.forEach(answer => {
+                const item = document.createElement('div');
+                item.className = 'answer-item';
+                item.textContent = answer;
+                list.appendChild(item);
+            });
+            container.appendChild(list);
+            return container;
+        }
+
+        function renderQuestionFeedback(question, includeCorrectAnswer) {
+            try {
+                explanationDiv.innerHTML = '';
+                let hasContent = false;
+                if (includeCorrectAnswer) {
+                    const answerHead = document.createElement('div');
+                    answerHead.className = 'answer-head';
+                    answerHead.textContent = '{{ i18n_correct_answer }}';
+                    explanationDiv.appendChild(answerHead);
+                    explanationDiv.appendChild(buildCorrectAnswerNode(question || {}));
+                    hasContent = true;
+                }
+                if (question && question.explanation && (config.showExplanations !== false)) {
+                    const h = document.createElement('div');
+                    h.className = 'explain-head';
+                    h.textContent = '{{ i18n_explain }}';
+                    const p = document.createElement('div');
+                    p.className = 'explain-body';
+                    p.textContent = String(question.explanation);
+                    explanationDiv.appendChild(h);
+                    explanationDiv.appendChild(p);
+                    hasContent = true;
+                }
+                explanationDiv.style.display = hasContent ? 'block' : 'none';
+                return hasContent;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function shouldKeepFishOnWrongAnswer() {
+            return teachingMode && currentQuestionType !== 'fill_blank' && currentQuestionType !== 'short_answer';
+        }
+
+        function turnCurrentFishIntoSkeleton() {
+            if (shouldKeepFishOnWrongAnswer()) return;
+            const fish = activeFish.find(f => f.questionIndex === currentQuestionIndex);
+            if (!fish) return;
+            fish.caught = true;
+            fish.skeleton = true;
+            fish.sinkRotation = (Math.random() - 0.5) * 10;
+            setImageSource(fish.element, [
+                fish.skeletonSprite,
+                sceneAssetMap[inferAssetName(fish.skeletonSprite)],
+                defaultAssetPath(inferAssetName(fish.skeletonSprite)),
+                localAssetPath(inferAssetName(fish.skeletonSprite))
+            ]);
+            fish.element.style.cursor = 'default';
+        }
+
+        function flashWrongMatchCard(button) {
+            try {
+                if (!button) return;
+                button.classList.remove('wrong');
+                void button.offsetWidth;
+                button.classList.add('wrong');
+                setTimeout(() => { try { button.classList.remove('wrong'); } catch (e) {} }, 420);
+            } catch (e) {}
+        }
+
+        function createSvgNode(name) {
+            return document.createElementNS('http://www.w3.org/2000/svg', name);
+        }
+
+        function initMatchingState(pairs) {
+            matchingState = {
+                pairs: Array.isArray(pairs) ? pairs : [],
+                pending: null,
+                connectionsByLeft: {},
+                connectionsByRight: {},
+                leftButtons: [],
+                rightButtons: [],
+                board: null,
+                svg: null
+            };
+            return matchingState;
+        }
+
+        function buildMatchingBoard(pairs) {
+            const state = initMatchingState(pairs);
+            const board = document.createElement('div');
+            board.className = 'matching-board';
+            board.id = 'matching-board';
+
+            const instruction = document.createElement('div');
+            instruction.className = 'matching-instruction';
+            instruction.textContent = 'Chọn một mục bên trái rồi chọn mục phù hợp bên phải để nối.';
+            optionsContainer.appendChild(instruction);
+
+            const svg = createSvgNode('svg');
+            svg.classList.add('match-link-layer');
+            board.appendChild(svg);
+
+            const leftColumn = document.createElement('div');
+            leftColumn.className = 'matching-column';
+            const leftTitle = document.createElement('div');
+            leftTitle.className = 'matching-column-title';
+            leftTitle.textContent = 'Vế trái';
+            leftColumn.appendChild(leftTitle);
+
+            const rightColumn = document.createElement('div');
+            rightColumn.className = 'matching-column';
+            const rightTitle = document.createElement('div');
+            rightTitle.className = 'matching-column-title';
+            rightTitle.textContent = 'Vế phải';
+            rightColumn.appendChild(rightTitle);
+
+            pairs.forEach((pair, index) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'match-card match-card-left';
+                btn.textContent = pair.left;
+                btn.addEventListener('click', () => handleMatchCardClick('left', index));
+                state.leftButtons[index] = btn;
+                leftColumn.appendChild(btn);
+            });
+
+            const shuffledRightItems = pairs.map((pair, index) => ({ text: pair.right, index }));
+            shuffleArray(shuffledRightItems);
+            shuffledRightItems.forEach((item) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'match-card match-card-right';
+                btn.textContent = item.text;
+                btn.addEventListener('click', () => handleMatchCardClick('right', item.index));
+                state.rightButtons[item.index] = btn;
+                rightColumn.appendChild(btn);
+            });
+
+            board.appendChild(leftColumn);
+            board.appendChild(rightColumn);
+            optionsContainer.appendChild(board);
+
+            state.board = board;
+            state.svg = svg;
+            requestAnimationFrame(drawMatchingLinks);
+        }
+
+        function handleMatchCardClick(side, index) {
+            if (!matchingState) return;
+            const pending = matchingState.pending;
+            if (pending && pending.side === side && pending.index === index) {
+                matchingState.pending = null;
+                updateMatchingVisualState();
+                return;
+            }
+            if (!pending) {
+                matchingState.pending = { side, index };
+                updateMatchingVisualState();
+                return;
+            }
+            if (pending.side === side) {
+                matchingState.pending = { side, index };
+                updateMatchingVisualState();
+                return;
+            }
+
+            const leftIndex = side === 'left' ? index : pending.index;
+            const rightIndex = side === 'right' ? index : pending.index;
+            if (teachingMode && leftIndex !== rightIndex) {
+                try { playFeedbackCue('wrong'); } catch (e) {}
+                flashWrongMatchCard(matchingState.leftButtons[leftIndex]);
+                flashWrongMatchCard(matchingState.rightButtons[rightIndex]);
+                matchingState.pending = null;
+                updateMatchingVisualState();
+                return;
+            }
+            setMatchingConnection(leftIndex, rightIndex);
+            matchingState.pending = null;
+            updateMatchingVisualState();
+            if (teachingMode && allMatchingPairsConnected()) {
+                setTimeout(() => { applyResult(true); }, 180);
+            }
+        }
+
+        function setMatchingConnection(leftIndex, rightIndex) {
+            if (!matchingState) return;
+            const prevRight = matchingState.connectionsByLeft[leftIndex];
+            if (typeof prevRight !== 'undefined') {
+                delete matchingState.connectionsByRight[prevRight];
+            }
+            const prevLeft = matchingState.connectionsByRight[rightIndex];
+            if (typeof prevLeft !== 'undefined') {
+                delete matchingState.connectionsByLeft[prevLeft];
+            }
+            matchingState.connectionsByLeft[leftIndex] = rightIndex;
+            matchingState.connectionsByRight[rightIndex] = leftIndex;
+        }
+
+        function updateMatchingVisualState() {
+            if (!matchingState) return;
+            matchingState.leftButtons.forEach((button, index) => {
+                if (!button) return;
+                button.classList.toggle('selected', !!matchingState.pending && matchingState.pending.side === 'left' && matchingState.pending.index === index);
+                button.classList.toggle('matched', typeof matchingState.connectionsByLeft[index] !== 'undefined');
+            });
+            matchingState.rightButtons.forEach((button, index) => {
+                if (!button) return;
+                button.classList.toggle('selected', !!matchingState.pending && matchingState.pending.side === 'right' && matchingState.pending.index === index);
+                button.classList.toggle('matched', typeof matchingState.connectionsByRight[index] !== 'undefined');
+            });
+            requestAnimationFrame(drawMatchingLinks);
+        }
+
+        function drawMatchingLinks() {
+            if (!matchingState || !matchingState.board || !matchingState.svg) return;
+            const boardRect = matchingState.board.getBoundingClientRect();
+            matchingState.svg.setAttribute('viewBox', `0 0 ${Math.max(1, boardRect.width)} ${Math.max(1, boardRect.height)}`);
+            matchingState.svg.innerHTML = '';
+            Object.keys(matchingState.connectionsByLeft).forEach((leftKey) => {
+                const leftIndex = parseInt(leftKey, 10);
+                const rightIndex = matchingState.connectionsByLeft[leftIndex];
+                const leftButton = matchingState.leftButtons[leftIndex];
+                const rightButton = matchingState.rightButtons[rightIndex];
+                if (!leftButton || !rightButton) return;
+
+                const leftRect = leftButton.getBoundingClientRect();
+                const rightRect = rightButton.getBoundingClientRect();
+                const x1 = leftRect.right - boardRect.left;
+                const y1 = leftRect.top - boardRect.top + leftRect.height / 2;
+                const x2 = rightRect.left - boardRect.left;
+                const y2 = rightRect.top - boardRect.top + rightRect.height / 2;
+                const curve = Math.max(40, Math.abs(x2 - x1) * 0.35);
+
+                const path = createSvgNode('path');
+                path.setAttribute('class', 'match-link-path');
+                path.setAttribute('d', `M ${x1} ${y1} C ${x1 + curve} ${y1}, ${x2 - curve} ${y2}, ${x2} ${y2}`);
+                matchingState.svg.appendChild(path);
+
+                const startNode = createSvgNode('circle');
+                startNode.setAttribute('class', 'match-link-node');
+                startNode.setAttribute('cx', x1);
+                startNode.setAttribute('cy', y1);
+                startNode.setAttribute('r', 5);
+                matchingState.svg.appendChild(startNode);
+
+                const endNode = createSvgNode('circle');
+                endNode.setAttribute('class', 'match-link-node');
+                endNode.setAttribute('cx', x2);
+                endNode.setAttribute('cy', y2);
+                endNode.setAttribute('r', 5);
+                matchingState.svg.appendChild(endNode);
+            });
+        }
+
+        function allMatchingPairsConnected() {
+            if (!matchingState || !Array.isArray(matchingState.pairs)) return false;
+            return matchingState.pairs.length > 0 && Object.keys(matchingState.connectionsByLeft).length === matchingState.pairs.length;
+        }
+
+        function getOptionChoiceLabel(index) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            return alphabet[index] || String(index + 1);
+        }
+
+        function createChoiceOption(text, index, onClick) {
+            const optionElement = document.createElement('button');
+            optionElement.type = 'button';
+            optionElement.className = 'option';
+            optionElement.textContent = text;
+            optionElement.dataset.index = index;
+            optionElement.dataset.choiceLabel = getOptionChoiceLabel(index);
+            optionElement.setAttribute('aria-pressed', 'false');
+            optionElement.addEventListener('click', () => {
+                if (optionElement.disabled) return;
+                onClick();
+            });
+            return optionElement;
+        }
+
+        function setSelectedOption(index) {
+            const optionEls = Array.from(optionsContainer.querySelectorAll('.option'));
+            optionEls.forEach((el, elIndex) => {
+                const isSelected = elIndex === index;
+                el.classList.toggle('selected', isSelected);
+                el.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+            });
+            return optionEls;
+        }
+
+        function disableChoiceOptions() {
+            try {
+                optionsContainer.querySelectorAll('.option').forEach(el => {
+                    el.style.pointerEvents = 'none';
+                    el.disabled = true;
+                    el.setAttribute('aria-disabled', 'true');
+                });
+            } catch (e) {}
+        }
+
+        function getCorrectChoiceIndex(question) {
+            try {
+                if (currentQuestionType === 'true_false') {
+                    return resolveTrueFalseMeta(question).correct ? 0 : 1;
+                }
+                const raw = (typeof question.correctAnswer !== 'undefined') ? question.correctAnswer : question.correct_answer;
+                const idx = parseInt(raw, 10);
+                return isNaN(idx) ? 0 : idx;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        function handleChoiceAttempt(selectedIndex) {
+            const question = questions[currentQuestionIndex] || {};
+            lastSelectedIndex = selectedIndex;
+            const optionEls = setSelectedOption(selectedIndex);
+            const selectedEl = optionEls[selectedIndex];
+            if (!teachingMode) {
+                if (currentQuestionType === 'true_false') {
+                    const val = (selectedIndex === 0);
+                    applyResult(val === resolveTrueFalseMeta(question).correct);
+                    return;
+                }
+                checkAnswer(selectedIndex);
+                return;
+            }
+            const correctIndex = getCorrectChoiceIndex(question);
+            if (selectedIndex === correctIndex) {
+                applyResult(true);
+                return;
+            }
+            try { playFeedbackCue('wrong'); } catch (e) {}
+            if (selectedEl) {
+                selectedEl.classList.add('wrong');
+                selectedEl.style.pointerEvents = 'none';
+                selectedEl.disabled = true;
+                selectedEl.setAttribute('aria-disabled', 'true');
+            }
+        }
+
+        function submitAnswer(){
+            try {
+                const q = questions[currentQuestionIndex] || {};
+                if (currentQuestionType === 'fill_blank' || currentQuestionType === 'short_answer') {
+                    const inp = document.getElementById('fill-input');
+                    const val = normalizeText(inp ? inp.value : '');
+                    const acceptedAnswers = getTextQuestionAcceptedAnswers(q);
+                    const ok = acceptedAnswers.map(normalizeText).includes(val);
+                    applyResult(ok);
+                } else if (currentQuestionType === 'matching') {
+                    let pairs = q.match_pairs || [];
+                    if (!pairs.length && Array.isArray(q.options)) { pairs = q.options.filter(p=>typeof p==='object' && p && ('left' in p) && ('right' in p)); }
+                    const ok = !!matchingState && pairs.length > 0 && pairs.every((p, i) => {
+                        const rightIndex = matchingState.connectionsByLeft[i];
+                        const picked = normalizeText((pairs[rightIndex] && pairs[rightIndex].right) || '');
+                        return picked === normalizeText(p.right);
+                    });
+                    applyResult(ok);
+                }
+            } catch(e){}
+        }
+
+        // Check answer
+        function checkAnswer(selectedIndex) {
+            const question = questions[currentQuestionIndex];
+            lastSelectedIndex = selectedIndex;
+            const isCorrect = selectedIndex === question.correctAnswer;
+            applyResult(isCorrect);
+        }
+
+        function applyResult(isCorrect){
+            const question = questions[currentQuestionIndex];
+            const shouldPauseForContinue = isSubmitFlowQuestion();
+            stopQuestionCountdown();
+            disableChoiceOptions();
+            try {
+                if (shouldPauseForContinue && submitBtn) {
+                    submitBtn.style.display = 'none';
+                    submitBtn.onclick = null;
+                }
+            } catch (e) {}
+            try {
+                if (currentQuestionType === 'multiple_choice' || currentQuestionType === 'true_false') {
+                    const optionEls = Array.from(optionsContainer.querySelectorAll('.option'));
+                    const correctIndex = getCorrectChoiceIndex(question || {});
+                    if (lastSelectedIndex !== null && optionEls[lastSelectedIndex]) {
+                        optionEls[lastSelectedIndex].classList.add(isCorrect ? 'correct' : 'wrong');
+                    }
+                    if (!isCorrect && optionEls[correctIndex]) {
+                        optionEls[correctIndex].classList.add('correct');
+                    }
+                }
+            } catch (e) {}
+            if (isCorrect) {
+                playFeedbackCue('correct');
+                try {
+                    const per = Math.max(1, Math.floor(100 / (questions.length || 1)));
+                    score = Math.min(100, score + per);
+                } catch(e) { score = Math.min(100, score + 100); }
+                updateScore();
+
+                // Animate fish badge flying down to top-left HUD bar
+                try {
+                    const fishBadge = document.getElementById('question-fish-badge');
+                    const fishImg = document.getElementById('question-fish-img');
+                    if (fishBadge && fishImg && fishImg.src && fishBadge.style.display !== 'none') {
+                        animateFishBadgeToHud(fishBadge, fishImg.src);
+                    }
+                } catch(e) {}
+                
+                // Remove the fish
+                const fish = activeFish.find(f => f.questionIndex === currentQuestionIndex);
+                if (fish) {
+                    fish.caught = true;
+                    fish.element.style.transition = 'transform 0.5s, opacity 0.5s';
+                    fish.element.style.transform = 'scale(0)';
+                    fish.element.style.opacity = '0';
+                    if (window.enableCute) {
+                        spawnHearts(fish.x + fish.width/2, fish.y + fish.height/2);
+                        spawnSparkles(fish.x + fish.width/2, fish.y + fish.height/2);
+                    }
+                    
+                    // Remove fish after animation
+                    setTimeout(() => {
+                        fish.element.remove();
+                        fish.dead = true;
+                    }, 500);
+                }
+                if (renderQuestionFeedback(question, false)) {
+                    showContinueOnly();
+                    return;
+                }
+                if (shouldPauseForContinue) {
+                    showContinueOnly();
+                    return;
+                }
+            } else {
+                playFeedbackCue('wrong');
+                turnCurrentFishIntoSkeleton();
+                if (renderQuestionFeedback(question, true) || shouldPauseForContinue) {
+                    showContinueOnly();
+                    return;
+                }
+            }
+            
+            // Hide panel after a delay
+            setTimeout(hideQuestionPanel, isCorrect ? 500 : 1500);
+        }
+
+        // When time for the current question expires
+        function timeUpQuestion() {
+            stopQuestionCountdown();
+            disableChoiceOptions();
+            try {
+                // Mark only the correct answer
+                const question = questions[currentQuestionIndex];
+                const options = optionsContainer.querySelectorAll('.option');
+                const correctIndex = getCorrectChoiceIndex(question || {});
+                if (options[correctIndex]) {
+                    options[correctIndex].classList.add('correct');
+                }
+            } catch(e){}
+            // Treat as wrong
+            try {
+                playFeedbackCue('wrong');
+                turnCurrentFishIntoSkeleton();
+            } catch(e){}
+            try {
+                const question = questions[currentQuestionIndex];
+                if (renderQuestionFeedback(question, true)) {
+                    showContinueOnly();
+                    return;
+                }
+            } catch(e){}
+            if (isSubmitFlowQuestion()) {
+                showContinueOnly();
+                return;
+            }
+            setTimeout(hideQuestionPanel, 1200);
+        }
+
+        // Hide question panel and resume game
+        function hideQuestionPanel() {
+            questionPanel.style.display = 'none';
+            try { questionPanel.classList.remove('matching-mode'); } catch(e){}
+            try { document.getElementById('question-timer').style.display = 'none'; } catch(e){}
+            try { if (questionTimer) { clearInterval(questionTimer); questionTimer = null; } }catch(e){}
+            try { explanationDiv.style.display = 'none'; explanationDiv.innerHTML=''; } catch(e){}
+            try { if (questionImageContainer && questionImage) { questionImage.src = ''; questionImageContainer.style.display = 'none'; } } catch(e){}
+            try { if (submitBtn) { submitBtn.style.display = 'none'; submitBtn.textContent = submitBtnDefaultText; submitBtn.onclick = null; } } catch(e){}
+            try { if (continueBtn) { continueBtn.style.display = 'none'; continueBtn.onclick = null; } } catch(e){}
+            resetMatchingState();
+            lastSelectedIndex = null;
+            gameActive = true;
+            lastTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Animate fish badge flying to top-left HUD
+        function animateFishBadgeToHud(fishBadge, imgSrc) {
+            const hud = document.getElementById('caught-fish-hud');
+            const list = document.getElementById('caught-fish-list');
+            if (!hud || !list) return;
+
+            hud.style.display = 'flex';
+            const badgeRect = fishBadge.getBoundingClientRect();
+            const listRect = list.getBoundingClientRect();
+
+            // Calculate destination position inside the list
+            const targetX = listRect.left + (listRect.width || 0);
+            const targetY = listRect.top + (listRect.height > 0 ? listRect.height / 2 - 19 : 0);
+
+            // Clone flying element
+            const flying = document.createElement('div');
+            flying.style.position = 'fixed';
+            flying.style.left = `${badgeRect.left}px`;
+            flying.style.top = `${badgeRect.top}px`;
+            flying.style.width = `${badgeRect.width}px`;
+            flying.style.height = `${badgeRect.height}px`;
+            flying.style.zIndex = '300';
+            flying.style.pointerEvents = 'none';
+            flying.style.borderRadius = '50%';
+            flying.style.background = 'radial-gradient(circle, #ffffff 50%, #e0f2fe 100%)';
+            flying.style.border = '3px solid #0ea5e9';
+            flying.style.boxShadow = '0 8px 24px rgba(14, 165, 233, 0.6)';
+            flying.style.display = 'flex';
+            flying.style.alignItems = 'center';
+            flying.style.justifyContent = 'center';
+
+            const img = document.createElement('img');
+            img.src = imgSrc;
+            img.style.maxWidth = '85%';
+            img.style.maxHeight = '85%';
+            img.style.objectFit = 'contain';
+            flying.appendChild(img);
+            document.body.appendChild(flying);
+
+            // Hide original static badge on question card
+            fishBadge.style.display = 'none';
+
+            // Smooth parabolic fly animation
+            try {
+                flying.animate([
+                    { left: `${badgeRect.left}px`, top: `${badgeRect.top}px`, width: `${badgeRect.width}px`, height: `${badgeRect.height}px`, opacity: 1, transform: 'scale(1) rotate(0deg)' },
+                    { left: `${targetX}px`, top: `${targetY}px`, width: '38px', height: '38px', opacity: 1, transform: 'scale(1.15) rotate(-15deg)' }
+                ], {
+                    duration: 650,
+                    easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                    fill: 'forwards'
+                }).onfinish = () => {
+                    flying.remove();
+                    addFishToHudBar(imgSrc);
+                };
+            } catch(e) {
+                flying.remove();
+                addFishToHudBar(imgSrc);
+            }
+        }
+
+        // Add caught fish icon to HUD list
+        function addFishToHudBar(src) {
+            const hud = document.getElementById('caught-fish-hud');
+            const list = document.getElementById('caught-fish-list');
+            const countSpan = document.getElementById('caught-count');
+            if (!hud || !list) return;
+
+            hud.style.display = 'flex';
+
+            const item = document.createElement('div');
+            item.className = 'hud-fish-item';
+            const img = document.createElement('img');
+            img.src = src;
+            img.alt = 'Cá đã bắt';
+            item.appendChild(img);
+            list.appendChild(item);
+
+            if (countSpan) countSpan.textContent = list.children.length;
+
+            hud.style.transform = 'scale(1.1)';
+            setTimeout(() => { hud.style.transform = 'scale(1)'; }, 200);
+        }
+
+        // Update score display
+        function updateScore() {
+            try { renderHudNumber(scoreDisplay, score, 1.25); } catch(e) { scoreDisplay.textContent = score; }
+        }
+
+        function renderHudNumber(container, value, scale){
+            try {
+                const s = String(Math.max(0, Math.min(9999, Math.floor(value))));
+                container.innerHTML = '';
+                container.style.display = 'inline-flex';
+                container.style.alignItems = 'center';
+                container.style.gap = '0';
+                for (let i=0;i<s.length;i++){
+                    const candidates = getHudGlyphCandidates(s[i]);
+                    if (!candidates.length) {
+                        const span = document.createElement('span');
+                        span.textContent = s[i];
+                        span.style.marginRight = (i < s.length - 1) ? '-0.08em' : '0';
+                        container.appendChild(span);
+                        continue;
+                    }
+                    const img = document.createElement('img');
+                    const fs = parseFloat(getComputedStyle(container).fontSize) || 18;
+                    const h = Math.round(fs * 1.15 * (scale||1));
+                    const overlapPx = Math.max(6, Math.round(h * 0.18));
+                    img.style.height = h + 'px';
+                    img.style.width = 'auto';
+                    img.style.marginRight = (i < s.length - 1) ? `${-overlapPx}px` : '0';
+                    img.style.verticalAlign = 'middle';
+                    img.style.flex = '0 0 auto';
+                    setImageSource(img, candidates);
+                    container.appendChild(img);
+                }
+            } catch(e) {}
+        }
+
+        // Update timer display
+        function updateTimer() {
+            // Show per-question countdown when panel is visible; else show game time
+            try {
+                const qVisible = questionPanel.style.display === 'block';
+                const val = qVisible ? (questionTimeLeft || 0) : timeLeft;
+                try { renderHudNumber(timerDisplay, val, 1.1); } catch(e) { timerDisplay.textContent = val; }
+                const qt = document.getElementById('question-timer');
+                if (qt) { qt.style.display = qVisible ? 'inline-block' : 'none'; qt.textContent = val + 's'; }
+            } catch(e) { timerDisplay.textContent = timeLeft; }
+            
+            // Change color when time is running low
+            const showLeft = (questionPanel.style.display === 'block') ? questionTimeLeft : timeLeft;
+            if (showLeft <= 10) {
+                timerDisplay.style.color = '#FF6B6B';
+                timerDisplay.style.fontWeight = 'bold';
+                
+                // Blink effect when very low
+                if (showLeft <= 5) {
+                    timerDisplay.style.animation = timeLeft % 2 === 0 ? 'blink 0.5s infinite' : 'none';
+                }
+            } else {
+                timerDisplay.style.color = '';
+                timerDisplay.style.fontWeight = '';
+                timerDisplay.style.animation = '';
+            }
+        }
+
+        // End the game
+        function endGame() {
+            gameActive = false;
+            clearInterval(timerInterval);
+            
+            // Show game over screen
+            try { renderHudNumber(finalScore, score, 1.8); } catch(e) { finalScore.textContent = score; }
+            gameOverScreen.style.display = 'flex';
+            
+            // Stop background music
+            bgm.pause();
+            bgm.currentTime = 0;
+        }
+
+        // Play sound effect
+        function playSound(audioElement) {
+            audioElement.currentTime = 0;
+            audioElement.play().catch(e => console.log("Audio play failed:", e));
+        }
+
+        // Cute particles
+        function spawnHearts(x, y) {
+            for (let i = 0; i < 4; i++) {
+                const h = document.createElement('div');
+                h.className = 'heart';
+                const dx = (Math.random() - 0.5) * 80;
+                const dy = -20 - Math.random() * 60;
+                h.style.left = `${x}px`;
+                h.style.top = `${y}px`;
+                h.style.opacity = '0.95';
+                gameContainer.appendChild(h);
+                const duration = 800 + Math.random()*400;
+                const sx = x, sy = y;
+                const step = 16;
+                let time = 0;
+                const anim = setInterval(()=>{
+                    time += step;
+                    const t = time/duration;
+                    h.style.left = `${sx + dx * t}px`;
+                    h.style.top = `${sy + dy * t}px`;
+                    h.style.opacity = `${1 - t}`;
+                    if (t>=1) { clearInterval(anim); h.remove(); }
+                }, step);
+            }
+        }
+        function spawnSparkles(x, y) {
+            for (let i = 0; i < 6; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                const ang = Math.random()*Math.PI*2;
+                const dist = 20 + Math.random()*40;
+                s.style.left = `${x}px`;
+                s.style.top = `${y}px`;
+                gameContainer.appendChild(s);
+                const duration = 600 + Math.random()*400;
+                const step = 16; let time=0; const sx=x, sy=y;
+                const vx = Math.cos(ang)*dist, vy = Math.sin(ang)*dist;
+                const anim = setInterval(()=>{
+                    time += step; const t = time/duration;
+                    s.style.left = `${sx + vx * t}px`;
+                    s.style.top = `${sy + vy * t}px`;
+                    s.style.opacity = `${1 - t}`;
+                    if (t>=1) { clearInterval(anim); s.remove(); }
+                }, step);
+            }
+        }
+
+        // Utility function to shuffle array
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Event listeners
+        restartBtn.addEventListener('click', () => {
+            gameOverScreen.style.display = 'none';
+            initGame();
+        });
+
+        // Initialize the game when the page loads
+        window.addEventListener('load', () => {
+            loadConfig();
+            // Preload muted audio to satisfy autoplay policies
+            try { bgm.volume = 0.0; bgm.muted = true; bgm.play().catch(()=>{}); } catch(e){}
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                // Recalculate fish positions if needed
+                activeFish.forEach(fish => {
+                    if (fish.x > gameContainer.clientWidth) {
+                        fish.x = gameContainer.clientWidth - fish.width;
+                    }
+                    if (fish.y > gameContainer.clientHeight - fish.height) {
+                        fish.y = gameContainer.clientHeight - fish.height;
+                    }
+                    updateFishElement(fish);
+                });
+                if (currentQuestionType === 'matching') {
+                    requestAnimationFrame(drawMatchingLinks);
+                }
+            });
+            const overlay = document.getElementById('start-overlay');
+            const btn = document.getElementById('start-btn');
+            btn.addEventListener('click', () => { try { bgm.muted = false; bgm.volume = 0.5; bgm.play().catch(()=>{});} catch(e){} overlay.style.display='none'; initGame(); });
+        });
+        // Remove auto-start fallback to require user start
+    </script>
+    <script type="text/JavaScript">
+        document.oncontextmenu = function() { return false; }
+        document.onselectstart = function() { return false; }
+        document.oncopy = function() { return false; }
+    </script>
+</body>
+</html>

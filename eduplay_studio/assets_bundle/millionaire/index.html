@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Who Wants to Be a Millionaire | Quiz Game</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="WEBDev - Front End Development Environment">
+    <meta name="keywords" content="HTML5, bootstrap, mobile, app, landing, ios, android, responsive">
+    <!-- Local styles only to avoid external fetch -->
+    <!--build:css css/styles.min.css-->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/mobile.css">
+
+    <!--endbuild-->
+
+</head>
+
+
+<video id="introVideo" preload="auto" playsinline hidden>
+  <source src="" type="video/mp4">
+</video>
+<audio id="music" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="music" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="music" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="music" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="music" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="music" preload="auto"><source src="" type="audio/mpeg"></audio>
+
+
+
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+<audio id="effects" preload="auto"><source src="" type="audio/mpeg"></audio>
+
+
+<body>
+
+    <section id="preloader">
+        <img class="loaderLogo" src="" data-default="images/Logo.png">
+        <div class="loader"></div>
+        <div class="preloader-1">
+            <div>Loading</div>
+            <br>
+            <span class="line line-1"></span>
+            <span class="line line-2"></span>
+            <span class="line line-3"></span>
+            <span class="line line-4"></span>
+            <span class="line line-5"></span>
+            <span class="line line-6"></span>
+            <span class="line line-7"></span>
+            <span class="line line-8"></span>
+            <span class="line line-9"></span>
+        </div>
+        <!-- loading gif removed -->
+    </section>
+
+
+    <section   id="mainMenu">
+        <img class="logo" src="" data-default="images/Logo.png">
+
+        <div class="textBlock">
+            <div class="textBlockText" id="playGameBtn">Play Game</div>
+        </div>
+        <div class="textBlock">
+            <div class="textBlockText" id="showLeaderboardBtn">Leaderboard</div>
+        </div>
+    </section>
+
+    <section   id="leaderboard">
+        <a href="./index.html">
+            <img class="logoSm" src="" data-default="images/Logo.png">
+        </a>
+
+        <div class="textBlock menuBtn mb-5" id="exitLeaderboardBtn">
+             <div class="textBlockText">Main Menu</div>
+            </div>
+<Br><Br>
+        <div class="leaderboardHeader">
+                <div class="leaderboardHeaderText">LEADERBOARD</div>
+            </div>
+
+            <div id="leaderboardMain_data"></div>
+        
+    </section>
+
+    <section  id="gameWindow">
+        <a href="./index.html">
+            <img class="logoSm" src="" data-default="images/Logo.png">
+        </a>
+        
+        <div hidden id="answer"></div>
+
+        <div class="settings">
+            <a href="#" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-volume-up"></i> Settings</a>
+       <!-- Button trigger modal -->
+       
+
+        </div>
+
+
+ 
+      
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="display:none;">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header bg-dark" >
+              <h5 class="modal-title" id="exampleModalLabel">Volume Settings</h5>
+             
+            </div>
+            <div class="modal-body bg-dark" >
+                <button class="btn btn-block btn-secondary btn-sm" id="volumeOff"><i class="fas fa-volume-off"></i> Volume Off</button>
+                <button class="btn btn-block btn-secondary btn-sm" id="volumeHalf"><i class="fas fa-volume-down"></i> Volume Quiet</button>
+                <button class="btn btn-block btn-secondary btn-sm" id="volumeOn"><i class="fas fa-volume-up"></i> Volume On</button>
+            </div>
+            <div class="modal-footer bg-secondary">
+              <button type="button" class="btn btn-dark btn-sm" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+        <div class="llWrapper">
+
+            <div class="lifeLine" id="llSwitch">
+                <div class="llText">⇆</div>
+                <div hidden id="cross1" class="cross"></div>
+            </div>
+
+            <div class="lifeLine" id="ll5050">
+                <div class="llText">50:50</div>
+                <div hidden id="cross2" class="cross"></div>
+            </div>
+            <div class="lifeLine" id="llAudience">
+                <div class="llText">👥</div>
+                <div hidden id="cross3" class="cross"></div>
+            </div>
+
+        </div>
+
+        <div id="countdownTimer" class="timer">
+            <div id="timer" class="hide" data-timer="60"></div>
+        </div>
+
+        <div id="scoreCutScene" class="modalWindow">
+            <div class="stars"></div>
+            <div class="twinkling"></div>
+            <div class="clouds"></div>
+            <div id="displayScore">$
+                <span id="sceneScoreValue">1,000,000</span>
+            </div>
+        </div>
+
+        <div id="endGameCutScene" class="modalWindow">
+            <div class="stars"></div>
+            <div class="twinkling"></div>
+            <div class="clouds"></div>
+            <div class="modalBox">
+
+                <div class="container text-center endGameContent">
+                    <h1 class="display-2 neon" style="color:white;" id="endGameHeader">You are a millionaire!</h1>
+                    <h2 class="display-3 neon" id="endGameScoreHeader">$
+                        <span id="endGameScore">1,000,000</span>
+                    </h2>
+                    <div class="textBlock endGameHomeBtn" id="exitGameBtn">
+                        <div class="textBlockText textBlockTextMob">Back to Home</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+        <div id="mobileScore">$
+            <span id="scoreValue">1,000,000</span>
+        </div>
+
+        <div id="AsktheAudience">
+            <div id="myProgress">
+                <div id="meter1" class="myBar">
+                    <span class="meterText">A</span>
+                </div>
+                <div id="meter2" class="myBar">
+                    <span class="meterText">B</span>
+                </div>
+                <div id="meter3" class="myBar">
+                    <span class="meterText">C</span>
+                </div>
+                <div id="meter4" class="myBar">
+                    <span class="meterText">D</span>
+                </div>
+            </div>
+        </div>
+
+        <div id="scoreMeter">
+            <div class="outer" id="q15" data-id="0">
+                <span class="level checkpoint">15</span>
+                <div class="bar">
+                    <div class="amount checkpoint">1,000,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q14" data-id="6.62%">
+                <span class="level">14</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">500,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q13" data-id="13.29%">
+                <span class="level">13</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">250,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q12" data-id="19.96%">
+                <span class="level">12</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">125,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q11" data-id="26.63%">
+                <span class="level">11</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">64,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q10" data-id="33.3%">
+                <span class="level checkpoint">10</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount checkpoint">32,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q9" data-id="39.97%">
+                <span class="level">9</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">16,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q8" data-id="46.64%">
+                <span class="level">8</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">8,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q7" data-id="53.31%">
+                <span class="level">7</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">4,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q6" data-id="59.98%">
+                <span class="level">6</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">2,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q5" data-id="66.65%">
+                <span class="level checkpoint">5</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount checkpoint">1,000</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q4" data-id="73.32%">
+                <span class="level">4</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">500</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q3" data-id="79.99%">
+                <span class="level">3</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">250</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q2" data-id="86.66%">
+                <span class="level">2</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">250</div>
+                </div>
+            </div>
+
+            <div class="outer" id="q1" data-id="93.33%">
+                <span class="level">1</span>
+                <div class="bar">
+                    <div class="progress"></div>
+                    <div class="amount">100</div>
+                </div>
+            </div>
+
+
+            <div class="progressBar">
+                <div class="progressLevel"></div>
+            </div>
+        </div>
+
+        <div id="questionBlock">
+            <div class="questionBox" id="questionBox">
+                <div id="question"></div>
+            </div>
+        </div>
+
+        <div id="answerBlock">
+
+            <div id="ans1B" class="answer answerOne">
+                <p class="answerText">A:
+                    <span id="ans1"></span>
+                </p>
+            </div>
+            <div id="ans2B" class="answer answerTwo">
+                <p class="answerText">B:
+                    <span id="ans2"></span>
+                </p>
+            </div>
+            <div id="ans3B" class="answer answerThree">
+                <p class="answerText">C:
+                    <span id="ans3"></span>
+                </p>
+            </div>
+            <div id="ans4B" class="answer answerFour">
+                <p class="answerText">D:
+                    <span id="ans4"></span>
+                </p>
+            </div>
+
+            <div id="explanationBlock" class="explanationBlock">
+                <div class="explanationBox" id="explanationBox">
+                    <div id="explanationText"></div>
+                    <button id="continueButton" class="continue-button">Tiếp tục</button>
+                </div>
+            </div>
+
+        </div>
+
+
+    </section>
+
+
+    <footer>
+        <div id="textbox">
+            <p class="alignleft">CUSTOMIZED BY EDUPLAY STUDIO</p>
+	    <p class="alignright">Based on the WWBM project by slvpkd (Sefton Kimberley Downes)</p>
+        </div>
+        <div style="clear: both;"></div>
+    </footer>
+
+    <!-- Pre-init default time from game-data (ensure available before app.js) -->
+    <script>
+      (function(){
+        function run(){
+          try{
+            var el = document.getElementById('game-data');
+            var obj = el ? JSON.parse(el.textContent||'{}') : {};
+            var def = parseInt(((obj.game_config||{}).question_time)||60,10);
+            window.DEFAULT_QUESTION_TIME = def;
+            // Không đụng tới EDU_QUESTIONS ở đây để tránh ghi đè cấu trúc đã được normalize
+          }catch(e){}
+        }
+        if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', run); } else { run(); }
+      })();
+    </script>
+    <script>
+      (function(){
+        function apply(){
+          try{
+            var def = parseInt(window.DEFAULT_QUESTION_TIME||60,10);
+            if (Array.isArray(window.EDU_QUESTIONS)){
+              window.EDU_QUESTIONS = window.EDU_QUESTIONS.map(function(q){
+                var t = parseInt(q && (q.time_limit!=null ? q.time_limit : q.time), 10);
+                if (!isFinite(t) || t <= 0 || t === 60){ t = def; }
+                var copy = Object.assign({}, q);
+                copy.time_limit = t;
+                return copy;
+              });
+            }
+          }catch(e){}
+        }
+        if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', apply); } else { apply(); }
+      })();
+    </script>
+
+    <!-- Local-only and shim to avoid external dependencies -->
+    <script>
+      (function(){
+        function J(arg){
+          var els;
+          if(typeof arg==='function'){ if(document.readyState!=='loading'){ arg(); } else { document.addEventListener('DOMContentLoaded', arg); } return { ready:function(fn){ if(document.readyState!=='loading'){ fn(); } else { document.addEventListener('DOMContentLoaded', fn); } return this; } } }
+          if(arg===document||arg===window){ els=[arg]; } else if(arg&&arg.nodeType===1){ els=[arg]; } else {
+            var sel=String(arg||'');
+            var m=sel.match(/^(.*?):contains\((['\"]?)(.*?)\2\)/);
+            if(m){ var base=m[1]||'*'; var text=m[3]||''; try{ els=Array.prototype.slice.call(document.querySelectorAll(base)).filter(function(e){ return (e.textContent||'').indexOf(text)!==-1; }); }catch(e){ els=[]; } }
+            else { els=Array.prototype.slice.call(document.querySelectorAll(sel)); }
+          }
+          var api={
+            els:els,
+            on:function(evt,fn){ els.forEach(function(e){ e.__listeners=e.__listeners||{}; (e.__listeners[evt]=e.__listeners[evt]||[]).push(fn); e.addEventListener(evt,fn); }); return api; },
+            off:function(evt){ els.forEach(function(e){ if(e.__listeners&&e.__listeners[evt]){ e.__listeners[evt].forEach(function(fn){ e.removeEventListener(evt,fn); }); e.__listeners[evt]=[]; } }); return api; },
+            click:function(fn){ return api.on('click',fn); },
+            fadeIn:function(){ els.forEach(function(e){ e.style.display='block'; }); return api; },
+            fadeOut:function(){ els.forEach(function(e){ e.style.display='none'; }); return api; },
+            hide:function(){ els.forEach(function(e){ e.style.display='none'; }); return api; },
+            show:function(){ els.forEach(function(e){ e.style.display='block'; }); return api; },
+            html:function(v){ if(v!==undefined){ els.forEach(function(e){ e.innerHTML=v; }); return api; } return els[0]?els[0].innerHTML:''; },
+            text:function(v){ if(v!==undefined){ els.forEach(function(e){ e.textContent=v; }); return api; } return els[0]?els[0].textContent:''; },
+            prop:function(n,v){ els.forEach(function(e){ e[n]=v; }); return api; },
+            focus:function(){ try{ if(els[0]&&typeof els[0].focus==='function'){ els[0].focus(); } }catch(e){} return api; },
+            data:function(k,v){ if(v===undefined){ return els[0]? els[0].getAttribute('data-'+k): undefined; } els.forEach(function(e){ e.setAttribute('data-'+k, v); }); return api; },
+            animate:function(props,dur){ els.forEach(function(e){ for(var k in (props||{})){ try{ e.style[k]=String(props[k]); }catch(ex){} } }); return api; },
+            addClass:function(c){ els.forEach(function(e){ String(c||'').split(/\s+/).filter(Boolean).forEach(function(tok){ try{ e.classList.add(tok); }catch(ex){} }); }); return api; },
+            removeClass:function(c){ els.forEach(function(e){ String(c||'').split(/\s+/).filter(Boolean).forEach(function(tok){ try{ e.classList.remove(tok); }catch(ex){} }); }); return api; },
+            closest:function(sel){ return J(els.map(function(e){ return e.closest(sel); }).filter(Boolean)); },
+            animateNumber:function(opts){ var t=els[0]; if(t){ if(opts&&typeof opts.numberStep==='function'){ opts.numberStep(opts.number,{elem:t}); } else { t.textContent=String((opts&&opts.number)||''); } } return api; },
+            TimeCircles:function(){ var el=els[0]; if(!el) return {stop:function(){},restart:function(){},addListener:function(){},getTime:function(){return 0;}}; if(!el.__tc){ var time=parseInt(el.getAttribute('data-timer')||'60',10), interval=null, listeners=[]; el.__tc={ stop:function(){ if(interval){ clearInterval(interval); interval=null; } }, restart:function(){ this.stop(); time=parseInt(el.getAttribute('data-timer')||'60',10); interval=setInterval(function(){ time--; listeners.forEach(function(cb){ try{ cb(); }catch(e){} }); },1000); }, addListener:function(cb){ listeners.push(cb); }, getTime:function(){ return time; } }; } return el.__tc; }
+          };
+          return api;
+        }
+        window.$=J; window.jQuery=J; $.animateNumber={ numberStepFactories:{ separator:function(sep){ return function(now,tween){ var el=tween.elem; var s=String(Math.round(now)); el.textContent=s.replace(/\B(?=(\d{3})+(?!\d))/g, sep); }; } } };
+        $.proxy = function(fn, ctx){ if (typeof fn==='string' && ctx && typeof ctx[fn]==='function'){ var f=ctx[fn]; return function(){ return f.apply(ctx, arguments); }; } if (typeof fn==='function'){ return function(){ return fn.apply(ctx||this, arguments); }; } return function(){}; };
+          $.getJSON = function(url, cb){ try{ fetch(url).then(function(r){ return r.json(); }).then(function(data){ try{ cb(data); }catch(e){} }).catch(function(){ try{ cb({results:[]}); }catch(e){} }); } catch(e){ try{ cb({results:[]}); }catch(_){ } } };
+          })();
+        </script>
+        
+        <!--build:js js/app.min.js -->
+        <script src="js/sounds.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/functions.js"></script>
+        
+        <!-- endbuild -->
+        <script src="./js/leaderboard.js"></script>
+        <script>
+          (function(){
+            function ensure(s,m){ s=String(s||''); if(!s) return ''; return s.startsWith('data:')? s : ('data:'+(m||'application/octet-stream')+';base64,'+s); }
+            document.addEventListener('DOMContentLoaded', function(){
+             try {
+                var gd=document.getElementById('game-data'); var obj=gd? JSON.parse(gd.textContent||'{}') : {}; var assets=(obj.game_config||{}).millionaire_assets||{};
+                // logos
+                var uriLogo=ensure(assets.logo_base64,'image/png');
+                document.querySelectorAll('img.logo, img.logoSm, img.loaderLogo').forEach(function(img){ if(uriLogo) img.src=uriLogo; });
+                // video
+                var v=document.getElementById('introVideo'); if(v && assets.intro_video_base64){ var vs=v.querySelector('source'); if(vs){ vs.src=ensure(assets.intro_video_base64,'video/mp4'); v.load(); } }
+                // music/effects
+                var mus=assets.music_tracks_base64||[], eff=assets.effects_tracks_base64||[];
+                document.querySelectorAll('audio#music source').forEach(function(s,i){ if(mus[i]){ s.src=ensure(mus[i],'audio/mpeg'); var a=s.parentElement; a && a.load(); } });
+                document.querySelectorAll('audio#effects source').forEach(function(s,i){ if(eff[i]){ s.src=ensure(eff[i],'audio/mpeg'); var a=s.parentElement; a && a.load(); } });
+                // backgrounds
+                var bgs=assets.background_images_base64||{};
+                // teacher time limits fallback patch
+                try {
+                  var default_time = parseInt(((obj.game_config||{}).question_time)||60,10);
+                  if (default_time === 45) { default_time = 30; } // workaround: đồng bộ với trình chỉnh sửa 30s
+                  window.DEFAULT_QUESTION_TIME = default_time;
+                  var qs = Array.isArray(obj.questions)? obj.questions: [];
+                  if (Array.isArray(window.EDU_QUESTIONS) && window.EDU_QUESTIONS.length) {
+                    for (var i=0; i<window.EDU_QUESTIONS.length && i<qs.length; i++) {
+                      // Force all questions to use project default if per-question time is missing or unreliable
+                      var tl = default_time;
+                      window.EDU_QUESTIONS[i].time_limit = tl;
+                    }
+                  }
+                } catch(e){}
+                // init visual timer label/value for shim
+                var t=document.getElementById('timer'); if(t){ var dt=(window.DEFAULT_QUESTION_TIME||60); t.setAttribute('data-timer', String(dt)); t.innerHTML='<div class="tc-label">TIME</div><div class="tc-value">'+dt+'</div>'; }
+              } catch(e){}
+            });
+          })();
+          // Minimal modal toggling
+          (function(){
+            document.addEventListener('click', function(ev){
+              var t = ev.target.closest('[data-toggle="modal"]');
+              if (t) { var sel = t.getAttribute('data-target'); var m = document.querySelector(sel); if (m) { m.style.display='block'; } ev.preventDefault(); }
+            });
+            document.addEventListener('click', function(ev){
+              var d = ev.target.closest('[data-dismiss="modal"]');
+              if (d) { var m = ev.target.closest('.modal'); if (m) { m.style.display='none'; } ev.preventDefault(); }
+            });
+          })();
+          // Update shim timer display
+          (function(){
+            var t = document.getElementById('timer');
+            function update(){
+              var api = window.$('#timer').TimeCircles();
+              var left = api.getTime();
+              if(t){ var v = t.querySelector('.tc-value'); if(v){ v.textContent = String(Math.max(0,left)); } }
+            }
+            setInterval(update, 1000);
+          })();
+        </script>
+        
+        <script type="text/JavaScript">
+            document.oncontextmenu = function() { return false; }
+            document.onselectstart = function() { return false; }
+            document.oncopy = function() { return false; }
+        </script>
+
+      </body>
+      
+      </html>

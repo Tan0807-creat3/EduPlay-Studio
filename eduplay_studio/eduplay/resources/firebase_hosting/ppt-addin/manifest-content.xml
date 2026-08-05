@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xsi:type="ContentApp">
+  <Id>b7af8b2d-4cfd-4a0a-8d7c-44f7bf70a1fe</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>EduPlay</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="EduPlay Viewer"/>
+  <Description DefaultValue="Embedded EduPlay web viewer for PowerPoint slides."/>
+  <IconUrl DefaultValue="https://eduplay-game.web.app/ppt-addin/icon.png"/>
+  <HighResolutionIconUrl DefaultValue="https://eduplay-game.web.app/ppt-addin/icon.png"/>
+  <SupportUrl DefaultValue="https://eduplay-game.web.app/support/addin"/>
+  <AppDomains>
+    <AppDomain>https://appsforoffice.microsoft.com</AppDomain>
+    <AppDomain>https://eduplay-game.web.app</AppDomain>
+  </AppDomains>
+  <Requirements>
+    <Sets DefaultMinVersion="1.1">
+      <Set Name="PowerPointApi" MinVersion="1.1"/>
+    </Sets>
+  </Requirements>
+  <Hosts>
+    <Host Name="Presentation"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://eduplay-game.web.app/ppt-addin/content.html"/>
+    <RequestedWidth>640</RequestedWidth>
+    <RequestedHeight>360</RequestedHeight>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>

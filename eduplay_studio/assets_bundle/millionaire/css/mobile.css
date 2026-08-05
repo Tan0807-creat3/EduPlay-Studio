@@ -1,0 +1,350 @@
+@media only screen and (max-width: 768px) and (orientation: portrait) {
+  .logo { display:block; margin-left:auto; margin-right:auto; width:100%; }
+  .logoSm { position:fixed; top:0px; left:0px; width:30%; opacity:0.3; }
+  #introVideo { position:fixed; right:0; bottom:0; top:35%; width:100%; min-width:0%; min-height:0%; }
+  #gameWindow { position:absolute; top:0px; left:0px; background:url("../images/backgroundGame.png") no-repeat center center fixed; background-size:cover; width:100%; }
+  #questionBlock { position:absolute; background:url("../images/QuestionBoxMOB.png"); background-size: contain; background-repeat: no-repeat; width:90%; top:45vh; left:50%; height:auto; min-height: 130px; margin-top:0; margin-left:0; transform: translateX(-50%); padding:20px; box-sizing: border-box; }
+  .questionBox { position:relative; width:100%; padding:0; height:auto; left:0; margin-left:0; text-align:center; font-size:1.1em; line-height:1.2em; word-wrap:break-word; display: flex; align-items: center; justify-content: center; min-height: 80px; }
+  #answerBlock { position:absolute; bottom: 5vh; left:50%; margin-left:0; transform: translateX(-50%); width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 0; }
+  .answer { background:url("../images/block.png"); background-size: 100% 100%; width:90%; height:50px; margin-bottom: 10px; position: relative; }
+  .answerOne, .answerTwo, .answerThree, .answerFour { position:relative; margin: 0 !important; top: 0 !important; left: 0 !important; }
+  .answerText { line-height:50px; margin-left:10%; width:80%; font-size: 0.9em; }
+  #scoreMeter { display:none; position:absolute; right:0px; }
+  .llWrapper { position:absolute; width:auto; background:none; top:10px; left:10px; }
+  .lifeLine { display:inline-block; width:50px; height:35px; background-size: contain; }
+  .llText { font-size:0.8em; line-height:1em; margin:10px auto; width:100%; height:100%; text-align:center; }
+  .cross { position:relative; top:-50px; left:-5px; width:55px; height:35px; background:url("../images/cross.png") 50% 50%; background-size: contain; }
+  .myBar { width:80%; height:30px; margin:10px; background:#e810fe; background:-moz-linear-gradient(45deg,#e810fe 0%,#6397ff 100%); background:-webkit-linear-gradient(45deg,#e810fe 0%,#6397ff 100%); background:linear-gradient(45deg,#e810fe 0%,#6397ff 100%); }
+  #AsktheAudience { position:absolute; top:80px; right:15%; padding:5px; width:100px; height:auto; transform:rotate(-90deg); }
+  #mobileScore { position:absolute; top:70px; right:10px; width:180px; height:30px; font-size:0.9em; line-height:1em; font-weight:bold; color:white; background:#E3AB28; display:block; text-align:right; border-radius:20px; padding:8px; }
+  #bigText { display:none; }
+  #displayScore { top:40%; font-size:4em; }
+  .modalBox { font-size:0.5em; margin-top:10%; }
+  #endGameHeader { font-size:5em; }
+  .endGameContent { gap:20px; padding:40px 20px; }
+  .endGameMsg { font-size:2em; }
+  .bigInput { width:100%; height:40px; border:1px solid #999999; padding:10px; font-size:2em; background:none; color:white; border:1px #E3AB28 dashed; border-radius:30px; }
+  #leaderboard_data { display:none; }
+  .textBlockText2 { font-size:3em; line-height:1.8em; }
+  #endGameScore { font-size:1em; }
+  #endGameScoreHeader { font-size:6em; }
+  #exitGameBtn.endGameHomeBtn { top:auto; right:auto; transform:scale(0.75); }
+  .timer { position:fixed; width:100px; height:100px; top:120px; right:10px; left: auto; }
+  .textBlockText { width:100%; text-align:center; font-size:1.7em; line-height:1.5em; }
+  .textBlockTextMob { font-size:2.7em; line-height:1.8em; }
+  .leaderboardHeader { display:none; }
+  #exitLeaderboardBtn { position:absolute; top:0px; right:-70px; }
+  .menuBtn { position:relative; transform:scale(0.5); }
+  #leaderboardMain_data { margin-top:30%; width:100%; }
+  .loaderLogo { display:block; position:absolute; left:50%; top:250px; width:200px; height:auto; margin-left:-100px; }
+  .loader { position:absolute; top:250px; left:50%; margin-left:-100px; border:6px solid transparent; border-top:6px solid #E3AB28; border-bottom:6px solid #E3AB28; border-radius:50%; width:200px; height:200px; animation: rotate 2s linear infinite; }
+  .preloader-1 { position:absolute; top:400px; margin:0px 0px; width:100%; height:12px; color:#fff; text-transform:uppercase; text-align:center; font-family:'Arial', sans-serif; font-size:1em; letter-spacing:2px; }
+  .settings { left:8px; top:100px; }
+}
+
+@media only screen and (max-width: 900px) and (orientation: landscape) {
+  .logo { display:block; margin-left:auto; margin-right:auto; width:30%; }
+  .logoSm { position:fixed; top:0px; left:0px; width:15%; opacity:1; }
+  #introVideo { position:fixed; right:0; bottom:0; top:0%; width:100%; min-width:0%; min-height:0%; }
+  #questionBlock { position:relative; background:url("../images/QuestionBox.png"); background-size: contain; background-repeat: no-repeat; width:80%; top:65vh; left:50%; height:auto; min-height: 60px; margin-top:0; margin-left:0; transform: translateX(-50%); padding: 10px; }
+  .questionBox { position:relative; width:80%; padding:0; height:auto; left:10%; margin-left:0; text-align:center; font-size:1.1em; line-height:1.4em; word-wrap:break-word; display: flex; align-items: center; justify-content: center; }
+  #answerBlock { position:absolute; left:50%; transform: translateX(-50%); top:75vh; width: 90%; display: flex; flex-wrap: wrap; justify-content: center; }
+  .answer { background:url("../images/block.png"); background-size: 100% 100%; width:45%; height:40px; margin: 2px; }
+  .answerOne, .answerTwo, .answerThree, .answerFour { position:relative; margin: 0 !important; top: 0 !important; left: 0 !important; }
+  .answerText { line-height:2.5em; margin-left:2.5em; width:80%; font-size: 0.8em; }
+  #scoreMeter { display:none; }
+  .llWrapper { position:absolute; width:auto; background:none; top:10px; left:120px; }
+  .lifeLine { display:inline-block; width:50px; height:35px; background-size: contain; }
+  .llText { font-size:0.8em; line-height:1em; margin:10px auto; width:100%; height:100%; text-align:center; }
+  .cross { position:relative; top:50px; left:-5px; width:55px; height:35px; background:url("../images/cross.png") 50% 50%; background-size: contain; }
+  #AsktheAudience { top:20px; right:-10px; width:100px; height:auto; transform:rotate(-90deg); }
+  #mobileScore { position:absolute; top:10px; right:10px; width:180px; height:30px; font-size:0.9em; line-height:1em; font-weight:bold; color:white; background:#E3AB28; display:block; text-align:right; border-radius:20px; padding:8px; }
+  #displayScore { font-size:6em; }
+  #endGameHeader { font-size:3em; }
+  .endGameContent { gap:16px; padding:30px 16px; }
+  .endGameMsg { font-size:1.2em; }
+  .bigInput { width:100%; height:40px; border:1px solid #999999; padding:10px; font-size:1.5em; background:none; color:white; border:1px #E3AB28 dashed; border-radius:30px; }
+  #leaderboard_data { display:none; }
+  .timer { position:fixed; width:80px; height:80px; top:10px; left:50%; transform: translateX(-50%); }
+  #exitGameBtn { top:0; right:0; transform:scale(0.7); }
+  #exitGameBtn.endGameHomeBtn { top:auto; right:auto; transform:scale(0.7); }
+  .loaderLogo { display:block; position:absolute; left:50%; top:150px; width:200px; height:auto; margin-left:-100px; }
+  .loader { position:absolute; top:150px; left:50%; margin-left:-100px; border:6px solid transparent; border-top:6px solid #E3AB28; border-bottom:6px solid #E3AB28; border-radius:50%; width:200px; height:200px; animation: rotate 2s linear infinite; }
+  .preloader-1 { position:absolute; top:280px; margin:0px 0px; width:100%; height:12px; color:#fff; text-transform:uppercase; text-align:center; font-family:'Arial', sans-serif; font-size:1em; letter-spacing:2px; }
+  .settings { left:8px; top:80px; }
+}
+
+@media only screen and (min-device-width: 375px) and (max-device-width: 667px) and (-webkit-min-device-pixel-ratio: 2) and (orientation: landscape) {
+  .logo {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 30%; }
+  .logoSm {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 15%;
+    opacity: 1; }
+  #introVideo {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    top: 0%;
+    width: 100%;
+    min-width: 0%;
+    min-height: 0%; }
+  #questionBlock {
+    position: relative;
+    background: url("../images/QuestionBox.png");
+    width: 994px;
+    top: 68vh;
+    left: 50%;
+    height: 78px;
+    margin-top: -59px;
+    margin-left: -437px;
+    transform: scale(0.75); }
+  .questionBox {
+    position: relative;
+    width: 50%;
+    padding: 3.0vh;
+    height: 78px;
+    left: 40%;
+    margin-left: -145.5px;
+    text-align: center;
+    font-size: 1.3em;
+    line-height: 1.6em;
+    word-wrap: break-word; }
+  #answerBlock {
+    position: absolute;
+    left: 5%;
+    top: -2%; }
+  .answer {
+    background: url("../images/block.png");
+    width: 349px;
+    height: 42px; }
+  .answerOne {
+    position: relative;
+    margin-left: 0px;
+    margin-top: 0px;
+    left: 0%; }
+  .answerTwo {
+    position: relative;
+    margin-left: 115px;
+    margin-top: -42px;
+    left: 50%; }
+  .answerThree {
+    position: relative;
+    margin-left: 0px;
+    margin-top: -20px;
+    left: 0%; }
+  .answerFour {
+    position: relative;
+    margin-left: 115px;
+    margin-top: -42px;
+    left: 50%; }
+  .answerText {
+    line-height: 2.5em;
+    margin-left: 2.5em;
+    width: 80%; }
+  #scoreMeter {
+    display: none; }
+  .llWrapper {
+    position: absolute;
+    width: auto;
+    background: none;
+    top: 25px;
+    left: 130px; }
+  .lifeLine {
+    display: inline-block;
+    width: 60px;
+    height: 40px; }
+  .llText {
+    font-size: 1em;
+    line-height: 1em;
+    margin: 10px auto;
+    width: 100%;
+    height: 100%;
+    text-align: center; }
+  .cross {
+    position: relative;
+    top: -60px;
+    left: -5px;
+    width: 65px;
+    height: 45px;
+    background: url("../images/cross.png") 50% 50%; }
+  #AsktheAudience {
+    top: 32px;
+    right: -5%;
+    width: 120px;
+    height: auto;
+    transform: rotate(-90deg); }
+  #mobileScore {
+    position: absolute;
+    top: 35px;
+    right: -80px;
+    width: 210px;
+    height: 30px;
+    font-size: 1em;
+    line-height: 1em;
+    font-weight: bold;
+    color: white;
+    background: #E3AB28;
+    display: block;
+    text-align: right;
+    border-radius: 20px;
+    padding: 8px; }
+  #displayScore {
+    font-size: 8em; }
+  #endGameHeader {
+    font-size: 4em; }
+  .endGameMsg {
+    font-size: 1.5em; }
+  .bigInput {
+    width: 100%;
+    height: 40px;
+    border: 1px solid #999999;
+    padding: 10px;
+    font-size: 2em;
+    background: none;
+    color: white;
+    border: 1px #E3AB28 dashed;
+    border-radius: 30px; }
+  #leaderboard_data {
+    display: none; }
+  .timer {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    top: 50%;
+    left: 60%; }
+  #exitGameBtn {
+    top: -10px;
+    right: -70px;
+    transform: scale(0.5); }
+  .loaderLogo {
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 150px;
+    width: 255px;
+    height: 220px;
+    margin: -122.5px; }
+  .loader {
+    position: absolute;
+    top: 150px;
+    left: 50%;
+    margin: -120px -110px;
+    border: 6px solid transparent;
+    border-top: 6px solid #E3AB28;
+    border-bottom: 6px solid #E3AB28;
+    border-radius: 50%;
+    width: 230px;
+    height: 230px;
+    animation: rotate 2s linear infinite; }
+  .preloader-1 {
+    position: absolute;
+    top: 280px;
+    margin: 0px 0px;
+    width: 100%;
+    height: 12px;
+    color: #fff;
+    text-transform: uppercase;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    font-size: 1em;
+    letter-spacing: 2px; }
+  .settings {
+    left: 8px;
+    top: 105px; } }
+
+.wt {
+  color: white; }
+
+.outer {
+  position: relative;
+  width: 150px;
+  height: auto;
+  border: 0px solid;
+  text-align: right;
+  margin-bottom: 1px; }
+
+.checkPointHL {
+  background: orange;
+  color: black;
+  border-radius: 10px;
+  height: auto; }
+
+.bar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  float: right;
+  height: 100%; }
+
+.progressBar {
+  position: absolute;
+  display: block;
+  top: 0px;
+  right: -50px;
+  width: 20px;
+  height: 100%;
+  background: orange; }
+
+.progressLevel {
+  background: black; }
+
+.amount {
+  position: relative;
+  width: 100%;
+  text-align: center; }
+
+.level {
+  padding-right: 5px; }
+
+.progress {
+  top: 0px;
+  left: 0px;
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  background: none; }
+
+.checkpoint {
+  color: white;
+  font-weight: bold; }
+
+#currentLevel {
+  font-size: 2em;
+  padding-top: 5px;
+  font-weight: bold; }
+
+#actualLevel {
+  font-size: 2em;
+  padding-top: 5px;
+  font-weight: bold;
+  color: white; }
+
+.b {
+  border: 1px solid orange;
+  width: 100%;
+  height: 200px !important; }
+
+.audienceHeader {
+  position: absolute;
+  top: 0px;
+  width: 100% !important;
+  height: 15%;
+  border-bottom: 1px solid orange; }
+
+.audienceMeter {
+  position: absolute;
+  width: 100%;
+  border: 1px solid white;
+  height: 85%; }
+
+.meterFill {
+  position: absolute;
+  width: 100%;
+  background: orange;
+  bottom: 0px !important; }

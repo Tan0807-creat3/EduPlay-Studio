@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:iis="http://wixtoolset.org/schemas/v4/wxs/iis">
+  <Package
+    Name="EduPlay PowerPoint Add-in"
+    Manufacturer="EduPlay"
+    Version="$(var.ProductVersion)"
+    UpgradeCode="{B8AC6D66-4B13-4B02-9E1D-7BC4E1FE87B9}"
+    InstallerVersion="500"
+    Compressed="yes"
+    Scope="perUser">
+    <MajorUpgrade DowngradeErrorMessage="A newer version of EduPlay PowerPoint Add-in is already installed." />
+    <MediaTemplate />
+
+    <Binary Id="EduPlayPublisherCert" SourceFile="$(var.SourceDir)\EduPlayPowerPointAddinVsto.cer" />
+
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="INSTALLFOLDER" Name="EduPlayPowerPointAddin" />
+    </StandardDirectory>
+
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="AddinFiles" Guid="{F33B0329-1C2C-4D76-9B9B-19F7C928F0C8}">
+        <File Id="EduPlayPowerPointAddinDll" Source="$(var.SourceDir)\EduPlayPowerPointAddin.dll" KeyPath="yes" />
+        <File Id="EduPlayPowerPointAddinDllManifest" Source="$(var.SourceDir)\EduPlayPowerPointAddin.dll.manifest" />
+        <File Id="EduPlayPowerPointAddinVsto" Source="$(var.SourceDir)\EduPlayPowerPointAddin.vsto" />
+        <File Id="MicrosoftOfficeToolsCommonV4UtilitiesDll" Source="$(var.SourceDir)\Microsoft.Office.Tools.Common.v4.0.Utilities.dll" />
+        <File Id="MicrosoftEdgeWebView2BootstrapperExe" Source="$(var.SourceDir)\MicrosoftEdgeWebView2Bootstrapper.exe" />
+        <File Id="MicrosoftWebWebView2CoreDll" Source="$(var.SourceDir)\Microsoft.Web.WebView2.Core.dll" />
+        <File Id="MicrosoftWebWebView2WinFormsDll" Source="$(var.SourceDir)\Microsoft.Web.WebView2.WinForms.dll" />
+        <File Id="MicrosoftWebWebView2WpfDll" Source="$(var.SourceDir)\Microsoft.Web.WebView2.Wpf.dll" />
+      </Component>
+
+      <Directory Id="TrustedSlidesFolder" Name="TrustedSlides">
+        <Component Id="TrustedSlidesFolderComponent" Guid="{F7E2B1A0-8A3E-4C5F-9D2E-62F7D4A0F3B1}">
+          <CreateFolder />
+          <RegistryKey Root="HKCU" Key="Software\EduPlayPowerPointAddin">
+            <RegistryValue Type="string" Name="TrustedSlidesFolder" Value="[INSTALLFOLDER]TrustedSlides\" KeyPath="yes" />
+          </RegistryKey>
+        </Component>
+      </Directory>
+
+      <Directory Id="RuntimesFolder" Name="runtimes">
+        <Directory Id="WinX64Folder" Name="win-x64">
+          <Directory Id="WinX64NativeFolder" Name="native">
+            <Component Id="WebView2LoaderX64" Guid="{A1B2C3D4-E5F6-4789-A1B2-C3D4E5F67890}">
+              <File Id="WebView2LoaderX64Dll" Source="$(var.SourceDir)\runtimes\win-x64\native\WebView2Loader.dll" KeyPath="yes" />
+            </Component>
+          </Directory>
+        </Directory>
+        <Directory Id="WinX86Folder" Name="win-x86">
+          <Directory Id="WinX86NativeFolder" Name="native">
+            <Component Id="WebView2LoaderX86" Guid="{B2C3D4E5-F678-49A1-B2C3-D4E5F6789012}">
+              <File Id="WebView2LoaderX86Dll" Source="$(var.SourceDir)\runtimes\win-x86\native\WebView2Loader.dll" KeyPath="yes" />
+            </Component>
+          </Directory>
+        </Directory>
+        <Directory Id="WinArm64Folder" Name="win-arm64">
+          <Directory Id="WinArm64NativeFolder" Name="native">
+            <Component Id="WebView2LoaderArm64" Guid="{C3D4E5F6-7890-4AB1-C2D3-E4F567890123}">
+              <File Id="WebView2LoaderArm64Dll" Source="$(var.SourceDir)\runtimes\win-arm64\native\WebView2Loader.dll" KeyPath="yes" />
+            </Component>
+          </Directory>
+        </Directory>
+      </Directory>
+
+      <Component Id="AddinTrustedRootCert" Guid="{10C9BDF5-1EF2-4E07-97F6-80D6F0896E6B}">
+        <iis:Certificate BinaryRef="EduPlayPublisherCert" Name="EduPlay PowerPoint Add-in (Dev)" StoreLocation="currentUser" StoreName="root" Request="no" />
+      </Component>
+
+      <Component Id="AddinTrustedPublisherCert" Guid="{F1D2F2A1-DB83-4DAB-82A3-552BF86175FD}">
+        <iis:Certificate BinaryRef="EduPlayPublisherCert" Name="EduPlay PowerPoint Add-in (Dev)" StoreLocation="currentUser" StoreName="trustedPublisher" Request="no" />
+      </Component>
+
+      <Component Id="AddinRegistry" Guid="{D1EA5F1F-84A2-4B2B-8B22-61C5E6E468E1}">
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\PowerPoint\Addins\EduPlayPowerPointAddin">
+          <RegistryValue Type="string" Name="FriendlyName" Value="EduPlay PowerPoint Add-in" KeyPath="yes" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay PowerPoint Add-in" />
+          <RegistryValue Type="integer" Name="LoadBehavior" Value="3" />
+          <RegistryValue Type="string" Name="Manifest" Value="[INSTALLFOLDER]EduPlayPowerPointAddin.vsto|vstolocal" />
+        </RegistryKey>
+      </Component>
+
+      <Component Id="AddinResiliency" Guid="{1B3F0B26-5E2E-4D64-AF96-2B2B0F9D1F1C}">
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\16.0\PowerPoint\Resiliency\DoNotDisableAddinList">
+          <RegistryValue Type="integer" Name="EduPlayPowerPointAddin" Value="1" KeyPath="yes" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\15.0\PowerPoint\Resiliency\DoNotDisableAddinList">
+          <RegistryValue Type="integer" Name="EduPlayPowerPointAddin" Value="1" />
+        </RegistryKey>
+      </Component>
+
+      <Component Id="PowerPointTrustedLocation" Guid="{A0D5B87F-6D05-4F76-8A67-5B8B8C4D8B1B}">
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\16.0\PowerPoint\Security\Trusted Locations\LocationEduPlay">
+          <RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]TrustedSlides\" KeyPath="yes" />
+          <RegistryValue Type="integer" Name="AllowSubfolders" Value="1" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay Trusted Slides" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\15.0\PowerPoint\Security\Trusted Locations\LocationEduPlay">
+          <RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]TrustedSlides\" />
+          <RegistryValue Type="integer" Name="AllowSubfolders" Value="1" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay Trusted Slides" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\14.0\PowerPoint\Security\Trusted Locations\LocationEduPlay">
+          <RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]TrustedSlides\" />
+          <RegistryValue Type="integer" Name="AllowSubfolders" Value="1" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay Trusted Slides" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\12.0\PowerPoint\Security\Trusted Locations\LocationEduPlay">
+          <RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]TrustedSlides\" />
+          <RegistryValue Type="integer" Name="AllowSubfolders" Value="1" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay Trusted Slides" />
+        </RegistryKey>
+      </Component>
+
+      <Component Id="InstallFolderTrustedLocation" Guid="{1EED3267-E191-45D2-8569-7AE50B8E6C61}">
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\16.0\PowerPoint\Security\Trusted Locations\LocationEduPlayInstall">
+          <RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]" KeyPath="yes" />
+          <RegistryValue Type="integer" Name="AllowSubfolders" Value="1" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay Add-in Install Folder" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\15.0\PowerPoint\Security\Trusted Locations\LocationEduPlayInstall">
+          <RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]" />
+          <RegistryValue Type="integer" Name="AllowSubfolders" Value="1" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay Add-in Install Folder" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\14.0\PowerPoint\Security\Trusted Locations\LocationEduPlayInstall">
+          <RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]" />
+          <RegistryValue Type="integer" Name="AllowSubfolders" Value="1" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay Add-in Install Folder" />
+        </RegistryKey>
+        <RegistryKey Root="HKCU" Key="Software\Microsoft\Office\12.0\PowerPoint\Security\Trusted Locations\LocationEduPlayInstall">
+          <RegistryValue Type="string" Name="Path" Value="[INSTALLFOLDER]" />
+          <RegistryValue Type="integer" Name="AllowSubfolders" Value="1" />
+          <RegistryValue Type="string" Name="Description" Value="EduPlay Add-in Install Folder" />
+        </RegistryKey>
+      </Component>
+
+      <Component Id="InstallerEnvironment" Guid="{6FD25172-1A51-4C8A-AFB9-0B96E3136F07}">
+        <RegistryKey Root="HKCU" Key="Environment">
+          <RegistryValue Type="string" Name="EDUPLAY_ADDIN_INSTALL_ROOT" Value="[INSTALLFOLDER]" KeyPath="yes" />
+        </RegistryKey>
+      </Component>
+    </DirectoryRef>
+
+    <Feature Id="MainFeature" Title="EduPlay PowerPoint Add-in" Level="1">
+      <ComponentRef Id="AddinFiles" />
+      <ComponentRef Id="TrustedSlidesFolderComponent" />
+      <ComponentRef Id="WebView2LoaderX64" />
+      <ComponentRef Id="WebView2LoaderX86" />
+      <ComponentRef Id="WebView2LoaderArm64" />
+      <ComponentRef Id="AddinTrustedRootCert" />
+      <ComponentRef Id="AddinTrustedPublisherCert" />
+      <ComponentRef Id="AddinRegistry" />
+      <ComponentRef Id="AddinResiliency" />
+      <ComponentRef Id="PowerPointTrustedLocation" />
+      <ComponentRef Id="InstallFolderTrustedLocation" />
+      <ComponentRef Id="InstallerEnvironment" />
+    </Feature>
+
+  </Package>
+</Wix>

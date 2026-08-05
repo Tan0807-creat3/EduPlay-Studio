@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<customUI xmlns="http://schemas.microsoft.com/office/2009/07/customui" onLoad="OnRibbonLoad">
+  <ribbon>
+    <tabs>
+      <tab idMso="TabInsert">
+        <group id="EduPlayGroup" label="EduPlay">
+          <button id="EduPlayImportBtn"
+                  label="Import EduPlay"
+                  size="large"
+                  onAction="OnImportEduPlay"
+                  getImage="GetImportImage" />
+          <button id="EduPlayPanelBtn"
+                  label="EduPlay Panel"
+                  size="large"
+                  onAction="OnOpenPanel" />
+        </group>
+      </tab>
+    </tabs>
+  </ribbon>
+</customUI>

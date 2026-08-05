@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EduPlay Game Viewer</title>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <style>
+    html, body { margin:0; padding:0; height:100%; background:#020617; color:#fff; font-family:Segoe UI, Arial, sans-serif; }
+    #bar { position:fixed; top:0; left:0; right:0; height:56px; background:#0f172a; display:flex; align-items:center; padding:0 12px; gap:12px; z-index:2; }
+    #brand { font-weight:700; color:#E3AB28; }
+    #status { flex:1; color:#fff; opacity:0.9; }
+    #copyBtn { background:#3B82F6; color:#fff; border:none; border-radius:8px; padding:8px 12px; font-weight:600; cursor:pointer; }
+    #copyBtn:hover { background:#2563EB; }
+    #frame { position:fixed; top:56px; left:0; right:0; bottom:0; width:100%; height:calc(100% - 56px); border:0; background:#020617; }
+  </style>
+</head>
+<body>
+  <div id="bar">
+    <div id="brand">EduPlay</div>
+    <div id="status">Loading...</div>
+    <button id="copyBtn">Copy Link</button>
+  </div>
+  <iframe id="frame" title="EduPlay Game"></iframe>
+  <script>
+    var firebaseConfig = {
+      apiKey: "AIzaSyCbpA6SCB1SyP155VgL9ILOEodUyNLsCUc",
+      authDomain: "eduplay-game.firebaseapp.com",
+      databaseURL: "https://eduplay-game-default-rtdb.firebaseio.com",
+      projectId: "eduplay-game",
+      storageBucket: "eduplay-game.firebasestorage.app",
+      messagingSenderId: "66865736910",
+      appId: "1:66865736910:web:56c21e8f5875548820749f",
+      measurementId: "G-9NK69LC0KE"
+    };
+  </script>
+  <script>
+    (function(){
+      function $(s){ return document.querySelector(s); }
+      function setStatus(msg){
+        var el = $('#status');
+        if(el){ el.textContent = msg; }
+      }
+      function slug(){
+        try {
+          var p = String(location.pathname||'').replace(/^\//,'').replace(/\/$/,'');
+          if (p) return p;
+          var u = new URL(location.href);
+          return u.searchParams.get('key')||'';
+        } catch(e){ return ''; }
+      }
+      function decodeBase64ToUint8(b64){
+        try{
+          var bin = atob(b64);
+          var len = bin.length;
+          var bytes = new Uint8Array(len);
+          for(var i=0;i<len;i++){ bytes[i] = bin.charCodeAt(i)&255; }
+          return bytes;
+        }catch(e){ return new Uint8Array(0); }
+      }
+      function hexToBytes(hex){
+        try{
+          var clean = String(hex||'').replace(/[^0-9a-f]/gi, '');
+          if(!clean || clean.length < 2){ return new Uint8Array(0); }
+          if(clean.length % 2){ clean = '0' + clean; }
+          var out = new Uint8Array(clean.length / 2);
+          for(var i=0;i<clean.length;i+=2){
+            out[i/2] = parseInt(clean.slice(i, i+2), 16) & 255;
+          }
+          return out;
+        }catch(e){
+          return new Uint8Array(0);
+        }
+      }
+      function xorBytes(bytes, keyHex){
+        try{
+          var key = hexToBytes(keyHex);
+          if(!key.length){ return bytes; }
+          var out = new Uint8Array(bytes.length);
+          for(var i=0;i<bytes.length;i++){
+            out[i] = (bytes[i] ^ key[i % key.length]) & 255;
+          }
+          return out;
+        }catch(e){
+          return bytes;
+        }
+      }
+      function renderHtmlText(htmlText){
+        try{
+          var frame = $('#frame');
+          if(!frame){ return; }
+          var blob = new Blob([String(htmlText||'')], {type:'text/html'});
+          var url = URL.createObjectURL(blob);
+          frame.src = url;
+        }catch(e){
+          setStatus('Load error');
+        }
+      }
+      function gunzipBytesToText(bytes, cb){
+        try{
+          if(typeof DecompressionStream === 'function'){
+            var ds = new DecompressionStream('gzip');
+            var s = new Blob([bytes]).stream().pipeThrough(ds);
+            new Response(s).text().then(function(txt){ cb(null, txt); }).catch(function(err){ cb(err||new Error('gunzip failed')); });
+          } else {
+            cb(new Error('DecompressionStream not supported'));
+          }
+        }catch(e){
+          cb(e);
+        }
+      }
+      function gunzipBytesToTextPromise(bytes){
+        return new Promise(function(resolve, reject){
+          gunzipBytesToText(bytes, function(err, txt){
+            if(err){ reject(err); return; }
+            resolve(String(txt||''));
+          });
+        });
+      }
+      function gunzipToText(b64, cb){
+        gunzipBytesToText(decodeBase64ToUint8(b64), cb);
+      }
+      function decodePayloadToText(base64Data, encoding){
+        return new Promise(function(resolve, reject){
+          try{
+            var enc = String(encoding||'base64').toLowerCase();
+            if(enc === 'gzip+base64'){
+              gunzipToText(String(base64Data||''), function(err, txt){
+                if(err || !txt){ reject(err || new Error('decode failed')); return; }
+                resolve(String(txt||''));
+              });
+              return;
+            }
+            resolve(decodeURIComponent(escape(window.atob(String(base64Data||'')))));
+          }catch(e){
+            reject(e);
+          }
+        });
+      }
+      function runGameBase64(base64Data, encoding){
+        decodePayloadToText(base64Data, encoding).then(function(htmlText){
+          renderHtmlText(htmlText);
+        }).catch(function(){
+          setStatus('Load error');
+        });
+      }
+      function loadGameFromFileUrl(fileUrl, encoding){
+        var enc = String(encoding||'text').toLowerCase();
+        setStatus('Loading game file...');
+        return fetch(String(fileUrl||''), { cache: 'no-store' }).then(function(resp){
+          if(!resp || !resp.ok){ throw new Error('fetch failed'); }
+          if(enc === 'gzip'){
+            return resp.arrayBuffer().then(function(buf){
+              return new Promise(function(resolve, reject){
+                gunzipBytesToText(new Uint8Array(buf), function(err, txt){
+                  if(err || !txt){ reject(err || new Error('gunzip failed')); return; }
+                  resolve(txt);
+                });
+              });
+            });
+          }
+          return resp.text();
+        });
+      }
+      function joinChunks(j, fieldName){
+        try{
+          var c = j && (fieldName ? j[fieldName] : (j.content_chunks || j.chunks));
+          if(!c) return '';
+          var keys = Object.keys(c);
+          if(!keys.length) return '';
+          keys.sort(function(a,b){ return parseInt(a,10)-parseInt(b,10); });
+          var out = '';
+          for(var i=0;i<keys.length;i++){
+            out += String(c[keys[i]]||'');
+          }
+          return out;
+        }catch(e){
+          return '';
+        }
+      }
+      function fetchLibraryManifest(db, assetPackProfile){
+        var profile = String(assetPackProfile || '').trim().toLowerCase();
+        if(!profile){
+          return Promise.resolve({});
+        }
+        return db.ref('asset_pack_libraries/' + profile).once('value').then(function(snap){
+          return snap.val() || {};
+        }).catch(function(){
+          return {};
+        });
+      }
+      function resolveAssetPackKey(db, assetPackKey, assetPackProfile){
+        var requestedKey = String(assetPackKey || '');
+        var profile = String(assetPackProfile || '').trim().toLowerCase();
+        if(!profile){
+          return Promise.resolve(requestedKey);
+        }
+        return fetchLibraryManifest(db, profile).then(function(manifest){
+          var versions = (manifest && manifest.versions) ? manifest.versions : {};
+          if(requestedKey){
+            var versionInfo = versions && versions[requestedKey] ? versions[requestedKey] : null;
+            if(versionInfo){
+              return String((versionInfo.storage_key || versionInfo.key || requestedKey) || '');
+            }
+            if(manifest && manifest.known_keys && manifest.known_keys[requestedKey]){
+              return requestedKey;
+            }
+            return requestedKey;
+          }
+          return String((manifest && (manifest.latest_key || manifest.key)) || '');
+        }).catch(function(){
+          return requestedKey || '';
+        });
+      }
+      function loadAssetPackPayload(db, resolvedKey){
+        var key = String(resolvedKey || '');
+        if(!key){
+          return Promise.resolve({});
+        }
+        setStatus('Loading shared assets...');
+        return db.ref('asset_packs/' + key).once('value').then(function(snap){
+          var j = snap.val();
+          if(!j){ return {}; }
+          var packed = joinChunks(j, 'chunks');
+          if(!packed){ return {}; }
+          var enc = String((j||{}).encoding || 'xor+gzip+base64').toLowerCase();
+          if(enc === 'xor+gzip+base64'){
+            var encryptedBytes = decodeBase64ToUint8(String(packed||''));
+            var decryptedBytes = xorBytes(encryptedBytes, key);
+            return gunzipBytesToTextPromise(decryptedBytes).then(function(txt){
+              var parsed = JSON.parse(String(txt||'{}'));
+              return (parsed && parsed.assets) ? parsed.assets : {};
+            });
+          }
+          return decodePayloadToText(String(packed||''), enc).then(function(txt){
+            var parsed = JSON.parse(String(txt||'{}'));
+            return (parsed && parsed.assets) ? parsed.assets : {};
+          });
+        }).catch(function(){
+          return {};
+        });
+      }
+      function loadAssetPack(db, assetPackKey, assetPackProfile){
+        var requestedKey = String(assetPackKey || '');
+        return resolveAssetPackKey(db, requestedKey, assetPackProfile).then(function(resolvedKey){
+          var candidates = [];
+          // Always prefer the key embedded in the game metadata.
+          // Older library manifests may carry stale indirections via `storage_key`.
+          if(requestedKey){ candidates.push(requestedKey); }
+          if(resolvedKey && candidates.indexOf(resolvedKey) === -1){
+            candidates.push(resolvedKey);
+          }
+          function tryLoad(index){
+            if(index >= candidates.length){
+              return Promise.resolve({});
+            }
+            return loadAssetPackPayload(db, candidates[index]).then(function(assets){
+              if(assets && Object.keys(assets).length){
+                return assets;
+              }
+              return tryLoad(index + 1);
+            });
+          }
+          return tryLoad(0);
+        });
+      }
+      function applyAssetPack(htmlText, assets){
+        try{
+          var out = String(htmlText||'');
+          var map = assets || {};
+          Object.keys(map).forEach(function(token){
+            out = out.split(token).join(String(map[token]||''));
+          });
+          return out;
+        }catch(e){
+          return String(htmlText||'');
+        }
+      }
+      function loadGameWithRetry(db, key, attempt){
+        var maxAttempts = 5;
+        var waitMs = 400 + attempt * 500;
+        setStatus(attempt ? ('Retry ' + attempt + '/' + maxAttempts + '...') : 'Loading...');
+        return db.ref('games/'+key).once('value').then(function(snap){
+          var j = snap.val();
+          if(!j){
+            if(attempt < maxAttempts){
+              return new Promise(function(res){ setTimeout(res, waitMs); }).then(function(){
+                return loadGameWithRetry(db, key, attempt + 1);
+              });
+            }
+            setStatus('Game not found');
+            return;
+          }
+          var enc = String((j||{}).encoding||'base64').toLowerCase();
+          var htmlPromise = null;
+          if(j && j.file_url){
+            htmlPromise = loadGameFromFileUrl(j.file_url, enc);
+          } else if(j && j.html_base64){
+            htmlPromise = decodePayloadToText(j.html_base64, enc);
+          } else if(j && j.content_chunks){
+            var contentAll = joinChunks(j, 'content_chunks');
+            if(!contentAll){
+              if(attempt < maxAttempts){
+                return new Promise(function(res){ setTimeout(res, waitMs); }).then(function(){
+                  return loadGameWithRetry(db, key, attempt + 1);
+                });
+              }
+              setStatus('Game not found');
+              return;
+            }
+            htmlPromise = decodePayloadToText(contentAll, enc);
+          } else if (j && j.chunks){
+            var all = joinChunks(j, 'chunks');
+            if(!all){
+              if(attempt < maxAttempts){
+                return new Promise(function(res){ setTimeout(res, waitMs); }).then(function(){
+                  return loadGameWithRetry(db, key, attempt + 1);
+                });
+              }
+              setStatus('Game not found');
+              return;
+            }
+            htmlPromise = decodePayloadToText(all, enc);
+          } else {
+            if(attempt < maxAttempts){
+              return new Promise(function(res){ setTimeout(res, waitMs); }).then(function(){
+                return loadGameWithRetry(db, key, attempt + 1);
+              });
+            }
+            setStatus('Game not found');
+          }
+          if(htmlPromise){
+            return htmlPromise.then(function(htmlText){
+              if(j && j.asset_pack_key){
+                return loadAssetPack(db, String(j.asset_pack_key||''), String(j.asset_pack_profile||'')).then(function(assets){
+                  return applyAssetPack(htmlText, assets);
+                });
+              }
+              return htmlText;
+            }).then(function(finalHtml){
+              if(!String(finalHtml||'').trim()){ throw new Error('empty html'); }
+              renderHtmlText(finalHtml);
+              setStatus('Ready');
+            });
+          }
+        }).catch(function(err){
+          var code = err && err.code ? String(err.code) : '';
+          if(code === 'PERMISSION_DENIED' && attempt < maxAttempts){
+            return new Promise(function(res){ setTimeout(res, waitMs); }).then(function(){
+              return loadGameWithRetry(db, key, attempt + 1);
+            });
+          }
+          if(code === 'PERMISSION_DENIED'){
+            setStatus('Unauthorized');
+          } else {
+            if(attempt < maxAttempts){
+              return new Promise(function(res){ setTimeout(res, waitMs); }).then(function(){
+                return loadGameWithRetry(db, key, attempt + 1);
+              });
+            }
+            setStatus('Load error');
+          }
+        });
+      }
+      function init(){
+        var s = slug();
+        if(!s){ setStatus('Missing key'); return; }
+        setStatus('Connecting...');
+        try{
+          if(typeof firebaseConfig !== 'undefined'){
+            if(!firebase.apps.length){ firebase.initializeApp(firebaseConfig); }
+          } else if(typeof window !== 'undefined' && typeof window.firebaseConfig !== 'undefined'){
+            if(!firebase.apps.length){ firebase.initializeApp(window.firebaseConfig); }
+          }
+        }catch(e){}
+        try{
+          var db = firebase.database();
+          var auth = firebase.auth();
+          auth.signInAnonymously().then(function(cred){
+            var user = cred && cred.user ? cred.user : null;
+            var uid = user && user.uid;
+            try{
+              if(uid){
+                var logRef = db.ref('access_logs').child(uid);
+                logRef.set({
+                  game_id: s,
+                  timestamp: firebase.database.ServerValue.TIMESTAMP
+                }).catch(function(){});
+              }
+            }catch(e){}
+            try{
+              if(user && typeof user.getIdToken === 'function'){
+                user.getIdToken(true).then(function(){
+                  return loadGameWithRetry(db, s, 0);
+                }).catch(function(){
+                  return loadGameWithRetry(db, s, 0);
+                });
+              } else {
+                loadGameWithRetry(db, s, 0);
+              }
+            }catch(e){
+              loadGameWithRetry(db, s, 0);
+            }
+          }).catch(function(){
+            setStatus('Auth error');
+          });
+        }catch(e){
+          setStatus('Load error');
+        }
+        $('#copyBtn').addEventListener('click', function(){
+          try {
+            var l = location.origin + '/' + s;
+            navigator.clipboard.writeText(l).then(function(){ setStatus('Link copied'); });
+          } catch(e){}
+        });
+      }
+      document.addEventListener('DOMContentLoaded', init);
+    })();
+  </script>
+</body>
+</html>

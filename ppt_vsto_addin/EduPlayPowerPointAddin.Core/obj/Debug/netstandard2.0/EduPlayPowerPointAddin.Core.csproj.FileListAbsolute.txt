@@ -1,0 +1,11 @@
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\bin\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.deps.json
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\bin\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.dll
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\bin\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.pdb
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\obj\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.csproj.AssemblyReference.cache
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\obj\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.GeneratedMSBuildEditorConfig.editorconfig
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\obj\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.AssemblyInfoInputs.cache
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\obj\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.AssemblyInfo.cs
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\obj\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.csproj.CoreCompileInputs.cache
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\obj\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.sourcelink.json
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\obj\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.dll
+E:\eduplay\v1.0\v1.0.0-real\ppt_vsto_addin\EduPlayPowerPointAddin.Core\obj\Debug\netstandard2.0\EduPlayPowerPointAddin.Core.pdb

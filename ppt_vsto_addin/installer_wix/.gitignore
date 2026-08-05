@@ -1,0 +1,4 @@
+staging/
+*.msi
+*.wixpdb
+*.cab

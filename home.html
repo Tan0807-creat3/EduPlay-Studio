@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <title>EduPlay-Studio Wiki – Home</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --bg: #020617;
+            --bg-soft: #02081f;
+            --card: #020617;
+            --card-soft: #02081f;
+            --border: #1f2937;
+            --accent: #22c55e;
+            --accent-soft: rgba(34, 197, 94, 0.14);
+            --accent-dark: #16a34a;
+            --text-main: #e5e7eb;
+            --text-soft: #9ca3af;
+            --text-strong: #f9fafb;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #033d28 0, #020617 40%, #020617 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 32px 16px 40px;
+        }
+        .page {
+            width: 100%;
+            max-width: 1080px;
+        }
+        .hero {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.16), rgba(56, 189, 248, 0.06));
+            border-radius: 18px;
+            padding: 22px 22px 20px;
+            border: 1px solid rgba(34, 197, 94, 0.35);
+            box-shadow: 0 24px 60px rgba(15, 23, 42, 0.95);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.78);
+            border: 1px solid rgba(148, 163, 184, 0.6);
+            color: var(--text-soft);
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .hero-badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--accent);
+            box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.3);
+        }
+        .hero-main {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .hero-text {
+            flex: 1 1 260px;
+            min-width: 260px;
+        }
+        .hero-title {
+            font-size: clamp(26px, 4vw, 32px);
+            font-weight: 800;
+            color: var(--text-strong);
+            letter-spacing: -0.03em;
+            margin-bottom: 10px;
+        }
+        .hero-subtitle {
+            font-size: 14px;
+            color: var(--text-soft);
+            max-width: 520px;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .hero-kids {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: rgba(22, 163, 74, 0.16);
+            border: 1px solid rgba(22, 163, 74, 0.55);
+            font-size: 11px;
+            color: #bbf7d0;
+            margin-bottom: 14px;
+        }
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid transparent;
+            transition: background-color 0.14s ease, border-color 0.14s ease, transform 0.08s ease;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: #022c22;
+            border-color: rgba(74, 222, 128, 0.9);
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.02);
+        }
+        .btn-ghost {
+            background: rgba(15, 23, 42, 0.85);
+            color: var(--text-main);
+            border-color: rgba(148, 163, 184, 0.35);
+        }
+        .btn-ghost:hover {
+            background: rgba(15, 23, 42, 1);
+        }
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+        .hero-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(30, 64, 175, 0.7);
+        }
+        .hero-stat {
+            flex: 0 0 210px;
+            max-width: 260px;
+            padding: 14px 14px 12px;
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.96);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            color: var(--text-soft);
+            font-size: 12px;
+        }
+        .hero-stat-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: rgba(156, 163, 175, 0.9);
+            margin-bottom: 6px;
+        }
+        .hero-stat-main {
+            font-size: 14px;
+            color: var(--text-main);
+            margin-bottom: 8px;
+        }
+        .hero-stat-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .hero-stat-list li {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .hero-stat-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--accent);
+        }
+        .layout {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.1fr);
+            gap: 18px;
+        }
+        @media (max-width: 860px) {
+            .layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+        .card {
+            background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.13), rgba(15, 23, 42, 0.95) 40%);
+            border-radius: 14px;
+            padding: 16px 16px 14px;
+            border: 1px solid rgba(31, 41, 55, 0.95);
+        }
+        .card-alt {
+            background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 0.96) 40%);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-strong);
+        }
+        .card-subtitle {
+            font-size: 11px;
+            color: var(--text-soft);
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 10px;
+            color: var(--text-soft);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            background: rgba(15, 23, 42, 0.9);
+        }
+        .pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 1);
+        }
+        .features {
+            list-style: none;
+            padding-left: 0;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 8px 14px;
+            font-size: 12px;
+            color: var(--text-main);
+        }
+        @media (max-width: 720px) {
+            .features {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+        .features li {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .features-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 5px;
+            background: var(--accent-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            color: #bbf7d0;
+            flex-shrink: 0;
+        }
+        .features-text-strong {
+            font-weight: 600;
+            color: var(--text-strong);
+        }
+        .steps {
+            list-style: none;
+            padding-left: 0;
+            font-size: 12px;
+            color: var(--text-main);
+        }
+        .steps li {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+        .steps-index {
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-soft);
+            flex-shrink: 0;
+        }
+        .steps-main {
+            font-weight: 500;
+        }
+        .steps-desc {
+            color: var(--text-soft);
+            font-weight: 400;
+        }
+        .links {
+            margin-top: 10px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 6px;
+            font-size: 12px;
+        }
+        .links a {
+            color: #a5b4fc;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .links-label {
+            color: var(--text-soft);
+        }
+        .footer-note {
+            margin-top: 16px;
+            font-size: 11px;
+            color: var(--text-soft);
+            text-align: right;
+        }
+        .footer-note strong {
+            color: #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                <span>EduPlay-Studio • Tạo trò chơi học tập không cần code</span>
+            </div>
+            <div class="hero-main">
+                <div class="hero-text">
+                    <h1 class="hero-title" data-i18n="home.hero_title"></h1>
+                    <div class="hero-kids">
+                        <span>🎮 Không khí trò chơi</span>
+                        <span>•</span>
+                        <span data-i18n="home.kids_badge_2">📚 Nội dung dành cho học sinh</span>
+                    </div>
+                    <p class="hero-subtitle">
+                        EduPlay-Studio là công cụ giúp giáo viên và học sinh tự thiết kế trò chơi
+                        trắc nghiệm, bắt cá, và nhiều hoạt động tương tác khác. Wiki này là điểm
+                        xuất phát để bạn khám phá cách cài đặt, sử dụng và tùy biến ứng dụng.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="btn btn-primary" href="https://github.com/Tan0807-creat3/EduPlay-Studio">
+                            Đến kho mã nguồn
+                        </a>
+                        <a class="btn btn-ghost" href="#quick-start">
+                            Bắt đầu nhanh
+                        </a>
+                    </div>
+                    <div class="hero-meta">
+                        <span><span>✅</span><span>Không cần biết lập trình</span></span>
+                        <span><span>🧑‍🏫</span><span>Thiết kế cho giáo viên và học sinh</span></span>
+                        <span><span>🌐</span><span>Xuất ra HTML5 để dạy học online</span></span>
+                    </div>
+                </div>
+                <aside class="hero-stat">
+                    <div class="hero-stat-title">EduPlay-Studio làm được gì?</div>
+                    <div class="hero-stat-main">
+                        Từ một bộ câu hỏi đơn giản, bạn có thể tạo thành một trò chơi sinh động
+                        chạy trực tiếp trên trình duyệt.
+                    </div>
+                    <ul class="hero-stat-list">
+                        <li><span class="hero-stat-dot"></span><span>Biên soạn câu hỏi trắc nghiệm nhiều dạng</span></li>
+                        <li><span class="hero-stat-dot"></span><span>Xuất file HTML5 để dùng offline hoặc đưa lên web</span></li>
+                        <li><span class="hero-stat-dot"></span><span>Tùy chỉnh giao diện, hiệu ứng, âm thanh</span></li>
+                    </ul>
+                </aside>
+            </div>
+        </section>
+
+        <section class="layout">
+            <section class="card">
+                <header class="card-header">
+                    <div>
+                        <div class="card-title">Tính năng chính</div>
+                        <div class="card-subtitle">Những gì EduPlay-Studio hỗ trợ cho lớp học</div>
+                    </div>
+                    <span class="pill">
+                        <span class="pill-dot"></span>
+                        <span>Giáo viên • Học sinh</span>
+                    </span>
+                </header>
+                <ul class="features">
+                    <li>
+                        <div class="features-icon">Q</div>
+                        <div>
+                            <div class="features-text-strong">Trình soạn câu hỏi trực quan</div>
+                            <div>Nhập nhanh câu hỏi, đáp án, giải thích; hỗ trợ nhiều kiểu câu hỏi.</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="features-icon">🎲</div>
+                        <div>
+                            <div class="features-text-strong">Nhiều kiểu trò chơi</div>
+                            <div>Quiz thường, Bắt cá, Millionaire và các biến thể giao diện khác.</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="features-icon">⚙️</div>
+                        <div>
+                            <div class="features-text-strong">Cấu hình linh hoạt</div>
+                            <div>Xáo trộn câu hỏi, giới hạn thời gian, điểm mỗi câu, hiệu ứng dễ thương.</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="features-icon">🌐</div>
+                        <div>
+                            <div class="features-text-strong">Xuất HTML5 một nút bấm</div>
+                            <div>Tạo file .html chạy được trên hầu hết trình duyệt, tiện chia sẻ cho học sinh.</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="features-icon">🧩</div>
+                        <div>
+                            <div class="features-text-strong">Hỗ trợ nhiều ngôn ngữ</div>
+                            <div>Hướng tới tiếng Việt trước, có thể mở rộng thêm các ngôn ngữ khác sau.</div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="features-icon">💾</div>
+                        <div>
+                            <div class="features-text-strong">Lưu và mở lại dự án</div>
+                            <div>Lưu cấu trúc câu hỏi và cài đặt thành dự án để chỉnh sửa bất cứ lúc nào.</div>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section id="quick-start" class="card card-alt">
+                <header class="card-header">
+                    <div>
+                        <div class="card-title">Bắt đầu nhanh</div>
+                        <div class="card-subtitle">3 bước để tạo một trò chơi đầu tiên</div>
+                    </div>
+                </header>
+                <ol class="steps">
+                    <li>
+                        <div class="steps-index">1</div>
+                        <div>
+                            <div class="steps-main">Cài đặt EduPlay-Studio</div>
+                            <div class="steps-desc">
+                                Tải mã nguồn từ GitHub, cài Python và các thư viện cần thiết. Xem chi tiết ở trang
+                                “Installation” trong wiki.
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="steps-index">2</div>
+                        <div>
+                            <div class="steps-main">Tạo dự án mới và nhập câu hỏi</div>
+                            <div class="steps-desc">
+                                Mở ứng dụng, tạo dự án, thêm câu hỏi, thiết lập đáp án đúng và giải thích.
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="steps-index">3</div>
+                        <div>
+                            <div class="steps-main">Xuất và chơi</div>
+                            <div class="steps-desc">
+                                Chọn kiểu game bạn muốn, nhấn xuất HTML5, sau đó mở file .html bằng trình duyệt để
+                                cho học sinh chơi trực tiếp.
+                            </div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="links">
+                    <div>
+                        <span class="links-label">Kho mã nguồn:</span>
+                        <a href="https://github.com/Tan0807-creat3/EduPlay-Studio">
+                            github.com/Tan0807-creat3/EduPlay-Studio
+                        </a>
+                    </div>
+                    <div>
+                        <span class="links-label">Trang cài đặt chi tiết:</span>
+                        <span>Wiki › Installation</span>
+                    </div>
+                    <div>
+                        <span class="links-label">Ví dụ trò chơi:</span>
+                        <span>Wiki › Examples (sẽ được bổ sung dần)</span>
+                    </div>
+                </div>
+                <div class="footer-note">
+                    Trang này là trang <strong>Home</strong> của wiki EduPlay-Studio.
+                </div>
+            </section>
+        </section>
+    </main>
+
+    
+    <script>
+(function(){var l=localStorage.getItem('edulang')||'vi';var t={};function a(k){return t[k]||k}function d(){document.querySelectorAll('[data-i18n]').forEach(function(e){var k=e.getAttribute('data-i18n');if(t[k]){e.textContent=t[k]}});document.documentElement.lang=l}fetch('./i18n/'+l+'.json').then(function(r){return r.json()}).then(function(dt){t=dt;d()}).catch(function(){return fetch('./i18n/en.json')}).then(function(r){if(r)return r.json()}).then(function(dt){if(dt){t=dt;d()}});window.setLang=function(n){localStorage.setItem('edulang',n);location.reload()};window.__t=a})();</script>
+</body>
+</html>

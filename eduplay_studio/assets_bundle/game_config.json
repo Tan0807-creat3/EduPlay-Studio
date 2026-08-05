@@ -1,0 +1,62 @@
+{
+  "game_type": "fishing",
+  "settings": {
+    "fish_count": 10,
+    "time_limit": 60,
+    "background_image": "background_seaweed_h.png",
+    "base_speed": 2.0,
+    "bubble_spawn_rate": 2.0,
+    "min_decorations": 3,
+    "max_decorations": 7
+  },
+  "assets": {
+    "base_path_img": "assets_bundle/kenney_platformer-kit/PNG/Default/",
+    "base_path_snd": "assets_bundle/sound/",
+    "backgrounds": [
+      "background_seaweed_a.png",
+      "background_seaweed_b.png",
+      "background_seaweed_c.png",
+      "background_seaweed_d.png",
+      "background_seaweed_e.png",
+      "background_seaweed_f.png",
+      "background_seaweed_g.png",
+      "background_seaweed_h.png",
+      "background_rock_a.png",
+      "background_rock_b.png",
+      "background_terrain.png"
+    ],
+    "fish_sprites": [
+      "fish_blue.png",
+      "fish_green.png",
+      "fish_orange.png",
+      "fish_pink.png",
+      "fish_grey.png",
+      "fish_grey_long_a.png",
+      "fish_grey_long_b.png"
+    ],
+    "decorations": [
+      "seaweed_green_a.png",
+      "seaweed_green_b.png",
+      "seaweed_grass_a.png",
+      "seaweed_grass_b.png",
+      "rock_a.png",
+      "rock_b.png"
+    ],
+    "bubbles": [
+      "bubble_a.png",
+      "bubble_b.png",
+      "bubble_c.png"
+    ]
+  },
+  "layers": {
+    "background": 0,
+    "decorations": 1,
+    "fish": 2,
+    "bubbles": 3,
+    "ui": 4
+  },
+  "collision": {
+    "fish_radius": 30,
+    "bubble_radius": 10
+  }
+}
