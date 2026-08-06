@@ -18,14 +18,9 @@ import requests
 
 class AIService:
     EMBEDDED_GROQ_KEYS: list[str] = []
-    DEFAULT_PROXY_ROOT_URL = "https://site--eduplay-ai--sx2zlgv27rbh.code.run"
+    DEFAULT_PROXY_ROOT_URL = ""  # REDACTED — configure via settings
     DEFAULT_PROXY_BASE_URL = DEFAULT_PROXY_ROOT_URL + "/openai/v1"
-    LEGACY_PROXY_BASE_URLS = {
-        "https://eduplay-ai.koyeb.app",
-        "https://eduplay-ai.koyeb.app/openai/v1",
-        "https://eduplay-ai.northflank.app",
-        "https://eduplay-ai.northflank.app/openai/v1",
-    }
+    LEGACY_PROXY_BASE_URLS: set[str] = set()  # REDACTED
     SERVER_WAKEUP_RETRY_SECONDS = 4
     SERVER_WAKEUP_MAX_ATTEMPTS = 3
 

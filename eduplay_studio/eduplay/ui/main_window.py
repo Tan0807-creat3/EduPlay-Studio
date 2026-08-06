@@ -10341,12 +10341,12 @@ QLabel {
                 pub = export_service.publish_to_firebase(
                     str(out),
                     name,
-                    "https://eduplay-game-default-rtdb.firebaseio.com",
+                    ""  # REDACTED,
                     project_id=proj_id,
                     progress_callback=_progress,
                     project_data=current_project,
                 )
-                export_service.cleanup_firebase_old("https://eduplay-game-default-rtdb.firebaseio.com", days=15, max_items=300)
+                export_service.cleanup_firebase_old(""  # REDACTED, days=15, max_items=300)
                 if not isinstance(pub, dict) or not pub.get("ok") or not pub.get("play_link"):
                     err_text = ""
                     try:

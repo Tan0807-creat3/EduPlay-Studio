@@ -522,7 +522,7 @@ class SettingsDialog(QDialog):
         proxy_row = QHBoxLayout()
         proxy_row.addWidget(QLabel(self._t("settings.ai_base_url", "Base URL")))
         self.groq_base_url_input = QLineEdit()
-        self.groq_base_url_input.setPlaceholderText("https://site--eduplay-ai--sx2zlgv27rbh.code.run/openai/v1")
+        self.groq_base_url_input.setPlaceholderText("")
         proxy_row.addWidget(self.groq_base_url_input)
         api_layout.addLayout(proxy_row)
 

@@ -366,7 +366,7 @@ class SettingsManager:
                 "allow_internet": True,
                 "allow_image_download": True,
                 "request_timeout_sec": 600,
-                "server_base_url": "https://site--eduplay-ai--sx2zlgv27rbh.code.run/openai/v1",
+                "server_base_url": "",
                 "_user_set": False
             },
             "device_auth": {

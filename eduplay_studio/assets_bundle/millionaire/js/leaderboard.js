@@ -4,12 +4,12 @@
 
 // Initialize Firebase
 var config = {
-    apiKey: "AIzaSyBvHSH_oBAjtaXoZ6qLjtVtPMEGhYxIX20",
-    authDomain: "wwbm-slvpkd.firebaseapp.com",
-    databaseURL: "https://wwbm-slvpkd.firebaseio.com",
-    projectId: "wwbm-slvpkd",
-    storageBucket: "wwbm-slvpkd.appspot.com",
-    messagingSenderId: "365633945854"
+    apiKey: "",
+    authDomain: "",
+    databaseURL: "",
+    projectId: "",
+    storageBucket: "",
+    messagingSenderId: ""
   };
   
   
