@@ -203,6 +203,3 @@ class AssetBundler:
         processed_html = re.sub(img_pattern, replace_img_src, html_content)
         
         return processed_html
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

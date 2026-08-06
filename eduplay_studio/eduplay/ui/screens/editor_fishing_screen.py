@@ -20,6 +20,3 @@ class EditorFishingScreen(EditorScreen):
         p['game_config'] = cfg
         super().load_project(p)
 
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

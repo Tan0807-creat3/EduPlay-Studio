@@ -1,6 +1,6 @@
 # TERMS OF USE – EDUPLAY STUDIO
 
-**Last updated:** 2026-06-05
+**Last updated:** 2026-06-08
 
 Welcome to **EduPlay Studio**, an educational application designed to support teachers and learners in creating and experiencing interactive learning games.
 

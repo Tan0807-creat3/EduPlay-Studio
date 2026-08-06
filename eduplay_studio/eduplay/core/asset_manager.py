@@ -437,6 +437,3 @@ class AssetManager:
         except Exception as e:
             print(f"Error getting tags: {e}")
             return []
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

@@ -7434,6 +7434,3 @@ pause
             pass
 
 
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

@@ -34,8 +34,7 @@ class AIService:
         self._device_id_cache = None
         self._machine_fingerprint_cache = None
         self._device_key_cache = None
-        print(f"[AI-INIT] Base URL: {self.base_url}")
-        print(f"[AI-INIT] Default Model: {self.default_model}")
+        # AI initialization logs removed for production
 
     def _get_settings_manager(self):
         if self.settings_manager is not None:
@@ -517,7 +516,7 @@ class AIService:
                     return
             self._last_log_text = msg
             self._last_log_ts = now
-            print(f"[AI] {msg}")
+            # logging.debug(f"[AI] {msg}")
 
         if not self._should_use_proxy():
             show_progress("Thiếu cấu hình AI server", 100)

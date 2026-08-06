@@ -1425,6 +1425,3 @@ class ChatWidget(QWidget):
                 except Exception:
                     pass
 
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

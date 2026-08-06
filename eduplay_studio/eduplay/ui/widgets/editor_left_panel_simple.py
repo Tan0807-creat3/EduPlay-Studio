@@ -1127,6 +1127,3 @@ class EditorLeftPanel(QWidget):
             self.emit_game_config_change()
         # Removed invalid layout reference to avoid runtime errors
 
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

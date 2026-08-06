@@ -6007,7 +6007,7 @@ QLabel {
                                                 r2 = str(result2 or "")
                                             except Exception:
                                                 r2 = ""
-                                            print(f"[AI-DEBUG] follow_up_done error={error2} len={len(r2)} preview={r2[:160]!r}")
+                                            # print(f"[AI-DEBUG] follow_up_done error={error2} len={len(r2)} preview={r2[:160]!r}")
                                     except Exception:
                                         pass
                                     if error2:
@@ -6161,7 +6161,7 @@ QLabel {
                                 try:
                                     if debug_ai:
                                         mnames = [str(c or "") for c, _a in (matches or [])][:8]
-                                        print(f"[AI-DEBUG] handle_text len={len(str(cur_text or ''))} matches={len(matches or [])} retry={int(state.get('tool_retry', 0) or 0)} cmds={mnames} display_len={len(str(display_text or ''))}")
+                                        # print(f"[AI-DEBUG] handle_text len={len(str(cur_text or ''))} matches={len(matches or [])} retry={int(state.get('tool_retry', 0) or 0)} cmds={mnames} display_len={len(str(display_text or ''))}")
                                 except Exception:
                                     pass
                                 try:
@@ -6255,7 +6255,7 @@ QLabel {
                                     if intent.get("wants_action") and _looks_like_clarification(cur_text):
                                         try:
                                             if debug_ai:
-                                                print("[AI-DEBUG] branch=clarification")
+                                                # print("[AI-DEBUG] branch=clarification")
                                         except Exception:
                                             pass
                                         self.chat_widget.set_ai_response(str(cur_text or "").strip())
@@ -9872,8 +9872,12 @@ QLabel {
                 add(os.path.join(home, "Music"))
                 add(os.path.join(home, "Videos"))
                 # common drives
-                for drv in ["C:\\", "D:\\", "E:\\"]:
-                    add(drv)
+                import string
+                from PySide6.QtCore import QDir
+                for letter in string.ascii_uppercase:
+                    drive = f"{letter}:\\"
+                    if os.path.exists(drive):
+                        add(drive)
                 if sidebar:
                     dlg.setSidebarUrls(sidebar)
             except Exception:
@@ -10626,6 +10630,3 @@ QLabel {
             except Exception:
                 pass
             
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

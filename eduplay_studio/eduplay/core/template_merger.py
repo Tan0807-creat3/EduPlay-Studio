@@ -206,6 +206,3 @@ class MillionaireTemplateMerger:
             f'<script id="asset-manifest" type="application/json">\n{manifest_json}\n</script>\n</body>')
         
         return processed_html
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

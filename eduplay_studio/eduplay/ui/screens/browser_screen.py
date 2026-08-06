@@ -1935,6 +1935,3 @@ class BrowserScreen(QWidget):
                     w.set_scale(effective_scale)
         except Exception:
             pass
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

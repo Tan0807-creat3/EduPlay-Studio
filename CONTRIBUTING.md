@@ -17,13 +17,13 @@ All contributions should respect and support this spirit.
 ## Project Links
 
 - Repository:  
-  (set the correct repository URL for your distribution)
+  https://github.com/Tan0807-creat3/EduPlay-Studio
 
 - Issues tracker:  
-  (set the correct issues URL for your distribution)
+  https://github.com/Tan0807-creat3/EduPlay-Studio/issues
 
 - Pull requests:  
-  (set the correct PR URL for your distribution)
+  https://github.com/Tan0807-creat3/EduPlay-Studio/pulls
 
 ---
 
@@ -149,7 +149,12 @@ Common commit types:
 - `style:` formatting only
 - `refactor:` code restructuring
 - `perf:` performance improvements
-- `test:` adding or fixing tests
+### Testing
+Before submitting a Pull Request, please test your changes:
+- Run the application and verify the new feature or fix.
+- Use the **Preview** feature to ensure game templates are working correctly.
+- Check for any console errors or crashes.
+- (Planned) Automated tests will be added in future versions.
 - `chore:` maintenance tasks
 - `ci:` CI/CD related changes
 - `build:` build system or dependencies

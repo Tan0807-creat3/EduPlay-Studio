@@ -233,6 +233,3 @@ class ThemeManager(QObject):
 # Global theme manager instance
 theme_manager = ThemeManager()
 
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

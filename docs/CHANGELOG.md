@@ -20,5 +20,13 @@ and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.ht
 - PowerPoint integration (Windows): installs local Office add-ins (taskpane + content) from within the app.
 - Packaging scripts: PyInstaller spec + Inno Setup installer script.
 
+### Changed
+- Reorganized project structure: moved documentation files to `docs/` folder.
+- Updated `README.md` and documentation for better clarity and professionalism.
+
+### Fixed
+- Cleaned up internal/debug logs and personal signatures from the codebase.
+- Removed unnecessary temporary and internal documentation files from the root directory.
+
 ### Notes
 - PowerPoint add-ins may require Office activation and a PowerPoint restart after installation.

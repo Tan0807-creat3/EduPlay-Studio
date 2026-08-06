@@ -1,57 +1,60 @@
 # EduPlay Studio 1.0.0
 
-EduPlay Studio is a desktop application for creating educational games with AI-assisted content generation. It provides project management, a visual editor, preview, and export to HTML5 and Native/PyGame.
+EduPlay Studio is a modern desktop application designed for educators to create, manage, and export interactive educational games. With built-in AI assistance, creating engaging content has never been easier.
 
-## License
+## ✨ Key Features
 
-This project is licensed under the PolyForm Noncommercial License 1.0.0. See [LICENSE](LICENSE).
+- **🎯 Diverse Game Templates**: Choose from Quiz Classic, Quiz Millionaire, or the interactive Fishing Game.
+- **🤖 Edubot (AI Assistant)**: Generate high-quality educational questions instantly using Groq AI.
+- **🛠 Visual Editor**: Easily manage questions, media, and game configurations in a user-friendly interface.
+- **🌐 Flexible Export**: Export your projects to HTML5 (web-ready) or Native (standalone) formats.
+- **📊 PowerPoint Integration**: Seamlessly integrate your games into PowerPoint presentations.
+- **🌍 Multi-language Support**: Available in English, Vietnamese, and more.
 
-## System requirements
+## 🚀 Quick Start
 
-- Windows 10/11 (tested)
-- Python 3.10+ (tested with Python 3.12)
-- pip
+### Prerequisites
+- Windows 10/11
+- Python 3.10+
+- [Tesseract OCR](https://github.com/UB-Mannheim/tesseract/wiki) (for OCR features)
 
-## Install & run (from source)
+### Installation
+1. Clone the repository and navigate to the project folder.
+2. Create and activate a virtual environment:
+   ```powershell
+   python -m venv venv
+   .\venv\Scripts\activate
+   ```
+3. Install dependencies:
+   ```powershell
+   pip install -r requirements.txt
+   ```
 
+### Running the App
 ```powershell
-python -m venv venv
-venv\Scripts\activate
-pip install -r requirements.txt
-python eduplay_studio\app.py
+python eduplay_studio/app.py
 ```
 
-## AI (Groq)
+## 🤖 AI Configuration (Groq)
 
-- EduPlay Studio uses Groq (OpenAI-compatible API).
-- Set environment variables:
-  - `GROQ_API_KEY` (or `EDUPLAY_GROQ_API_KEY`) (required)
-  - `GROQ_MODEL` (optional, default: `llama-3.1-8b-instant`)
+To enable AI features, set the following environment variables:
+- `GROQ_API_KEY` (Required)
+- `GROQ_MODEL` (Optional, default: `llama-3.1-8b-instant`)
 
-## PowerPoint integration (Windows)
+## 📚 Documentation
 
-EduPlay Studio can install the PowerPoint VSTO add-in (MSI).
+Detailed documentation is available in the `docs/` folder:
 
-- Open EduPlay Studio → Settings → Add-in → Install / Repair Add-in.
-- Approve the admin prompt (if asked).
-- Restart PowerPoint.
-- In PowerPoint, find the EduPlay button/tab on the ribbon (it may be under Add-ins).
+- **[User Guide](docs/USER_GUIDE.md)**: How to use the app and its features.
+- **[Installation Guide](docs/INSTALLATION.md)**: Detailed setup and troubleshooting.
+- **[Roadmap](docs/ROADMAP.md)**: Future plans and upcoming features.
+- **[Security Policy](docs/SECURITY.md)**: How we handle security and reporting.
+- **[Changelog](docs/CHANGELOG.md)**: History of changes and releases.
+- **[Contributing](docs/CONTRIBUTING.md)**: How to help improve EduPlay Studio.
 
-Notes:
-- Office should be activated; deactivated Office may hide add-ins.
+## 📜 License
 
-## Export
+This project is licensed under the **PolyForm Noncommercial License 1.0.0**. See the [LICENSE](LICENSE) file for details.
 
-- HTML5 export (offline-ready)
-- Native/PyGame export
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md).
-
-## Docs
-
-- [INSTALLATION.md](INSTALLATION.md)
-- [USER_GUIDE.md](USER_GUIDE.md)
-- [ROADMAP.md](ROADMAP.md)
-- [SECURITY.md](SECURITY.md)
+---
+Developed with ❤️ for Education.

@@ -1,3 +1,7 @@
+# Secrets and sensitive data
+*.fernet
+ai_proxy_token.txt
+
 __pycache__/
 *.py[cod]
 *.pyo

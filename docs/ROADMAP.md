@@ -8,6 +8,7 @@ EduPlay Studio 1.0.0 is the first release. This roadmap describes candidate dire
 - Undo/redo in editor
 - Better export diagnostics (clearer error messages)
 - More templates and UI polish
+- **Automated Testing**: Implement unit tests using `pytest` for core logic.
 
 ## 1.2 (planned)
 

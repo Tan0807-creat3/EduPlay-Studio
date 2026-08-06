@@ -676,6 +676,3 @@ class SettingsManager:
         else:
             # Generic validation - non-empty and reasonable length
             return len(api_key.strip()) > 10
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

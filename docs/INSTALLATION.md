@@ -2,7 +2,12 @@
 
 EduPlay Studio 1.0.0 is primarily tested on Windows 10/11.
 
-## Install from source (Windows)
+## Prerequisites
+
+- **Python 3.10+**
+- **Tesseract OCR**: Required for OCR features (reading text from images).
+  - Download and install from [UB-Mannheim/tesseract](https://github.com/UB-Mannheim/tesseract/wiki).
+  - Add the installation path to your system's PATH variable.
 
 1. Create and activate a virtual environment:
 

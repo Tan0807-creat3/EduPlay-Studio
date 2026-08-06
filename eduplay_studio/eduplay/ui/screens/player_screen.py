@@ -1503,6 +1503,3 @@ class PlayerScreen(QWidget):
         except Exception:
             pass
 
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""

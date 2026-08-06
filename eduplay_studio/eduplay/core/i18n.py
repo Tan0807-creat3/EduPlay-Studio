@@ -49,6 +49,3 @@ class I18n:
             except Exception:
                 return val
         return val
-"""
-Nguyen-Thanh-Tan ¬_¬
-"""
