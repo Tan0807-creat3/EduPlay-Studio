@@ -1,3 +1,6 @@
+> [!NOTE]
+> To comply with our security and copyright policies, certain features have been removed from this public release. These changes do not impact the software's core functionality or overall performance.
+
 # EduPlay Studio 1.0.0
 
 EduPlay Studio is a modern desktop application designed for educators to create, manage, and export interactive educational games. With built-in AI assistance, creating engaging content has never been easier.

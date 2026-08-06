@@ -852,3 +852,6 @@ class HomeScreen(QWidget):
         except Exception:
             pass
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

@@ -95,8 +95,16 @@ class ExportService:
         env_key = str(os.environ.get("EDUPLAY_FIREBASE_SERVICE_ACCOUNT_FERNET_KEY") or "").strip()
         if env_key:
             return env_key.encode("utf-8")
-        # REDACTED — Fernet key seed removed for security
-        return b""
+        # Obfuscation only: bundled builds still need a deterministic runtime key.
+        seed = "".join(
+            (
+                "eduplay::desktop::firebase::",
+                "service-account::bundle::",
+                "fbsvc::d48fafeb3b::",
+                "publish::runtime::v1",
+            )
+        ).encode("utf-8")
+        return base64.urlsafe_b64encode(hashlib.sha256(seed).digest())
 
     def _decrypt_service_account_fernet(self, token_text: str) -> str:
         text = str(token_text or "").strip()
@@ -142,7 +150,8 @@ class ExportService:
             _add(f"{pid}.appspot.com")
 
         if not candidates:
-            pass  # REDACTED — default bucket names removed
+            _add("eduplay-game.firebasestorage.app")
+            _add("eduplay-game.appspot.com")
         return candidates
 
     def _firebase_storage_bucket(self, project_id: str = "", service_account: Optional[Dict] = None) -> str:
@@ -7434,3 +7443,6 @@ pause
             pass
 
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

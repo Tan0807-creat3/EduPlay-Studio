@@ -259,3 +259,6 @@ class FlatDropdown(QWidget):
     def sizeHint(self):
         return self.button.sizeHint()
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

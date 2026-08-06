@@ -366,7 +366,7 @@ class SettingsManager:
                 "allow_internet": True,
                 "allow_image_download": True,
                 "request_timeout_sec": 600,
-                "server_base_url": "",
+                "server_base_url": "https://site--eduplay-ai--sx2zlgv27rbh.code.run/openai/v1",
                 "_user_set": False
             },
             "device_auth": {
@@ -676,3 +676,6 @@ class SettingsManager:
         else:
             # Generic validation - non-empty and reasonable length
             return len(api_key.strip()) > 10
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

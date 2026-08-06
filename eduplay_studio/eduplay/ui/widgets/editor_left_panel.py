@@ -1519,3 +1519,6 @@ class EditorLeftPanel(QWidget):
             'randomize_questions': self.randomize_questions_check.isChecked() if hasattr(self, 'randomize_questions_check') else True
         }
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

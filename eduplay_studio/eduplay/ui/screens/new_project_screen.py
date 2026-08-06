@@ -547,3 +547,6 @@ class NewProjectScreen(QWidget):
             pass
         return ""
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

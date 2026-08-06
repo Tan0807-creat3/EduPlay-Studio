@@ -2719,3 +2719,6 @@ class EditorCenterPanel(QWidget):
             if hasattr(self, 'preview_config_btn'):
                 self._minimize_widget(self.preview_config_btn)
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

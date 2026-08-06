@@ -1801,3 +1801,6 @@ class ImportService:
                     pass
         except Exception as e:
             raise RuntimeError(I18n.t("import.error.doc_template_failed", error=str(e)))
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

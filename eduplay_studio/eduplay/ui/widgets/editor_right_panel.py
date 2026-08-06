@@ -1056,3 +1056,6 @@ class EditorRightPanel(QWidget):
             # Preview game configuration
             self.preview_game(project_data)
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+           xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+           xsi:type="TaskPaneApp">
+  <Id>6d96ec23-c4df-4db2-b6b1-d9b7cf5dded7</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>EduPlay</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="EduPlay Studio"/>
+  <Description DefaultValue="Import an EduPlay HTML export and sync it to a PowerPoint slide viewer."/>
+  <IconUrl DefaultValue="https://eduplay-game.web.app/ppt-addin/icon.png"/>
+  <HighResolutionIconUrl DefaultValue="https://eduplay-game.web.app/ppt-addin/icon.png"/>
+  <SupportUrl DefaultValue="https://eduplay-game.web.app/support/addin"/>
+  <AppDomains>
+    <AppDomain>https://appsforoffice.microsoft.com</AppDomain>
+    <AppDomain>https://eduplay-game.web.app</AppDomain>
+  </AppDomains>
+  <Requirements>
+    <Sets DefaultMinVersion="1.1">
+      <Set Name="PowerPointApi" MinVersion="1.1"/>
+    </Sets>
+  </Requirements>
+  <Hosts>
+    <Host Name="Presentation"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://eduplay-game.web.app/ppt-addin/taskpane.html"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+                    xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Presentation">
+        <DesktopFormFactor>
+          <FunctionFile resid="Commands.Url"/>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabInsert">
+              <Group id="EduPlay.InsertGroup">
+                <Label resid="InsertGroup.Label"/>
+                <Control xsi:type="Button" id="EduPlay.OpenImportPane">
+                  <Label resid="OpenPane.Label"/>
+                  <Supertip>
+                    <Title resid="OpenPane.Label"/>
+                    <Description resid="OpenPane.Description"/>
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16"/>
+                    <bt:Image size="32" resid="Icon.32"/>
+                    <bt:Image size="80" resid="Icon.80"/>
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>EduPlayImportTaskpane</TaskpaneId>
+                    <SourceLocation resid="Taskpane.Url"/>
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16" DefaultValue="https://eduplay-game.web.app/ppt-addin/icon.png"/>
+        <bt:Image id="Icon.32" DefaultValue="https://eduplay-game.web.app/ppt-addin/icon.png"/>
+        <bt:Image id="Icon.80" DefaultValue="https://eduplay-game.web.app/ppt-addin/icon.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Commands.Url" DefaultValue="https://eduplay-game.web.app/ppt-addin/commands.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="https://eduplay-game.web.app/ppt-addin/taskpane.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="InsertGroup.Label" DefaultValue="EduPlay"/>
+        <bt:String id="OpenPane.Label" DefaultValue="Import EduPlay"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="OpenPane.Description" DefaultValue="Import a single-file EduPlay HTML package and sync it to the embedded slide viewer."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

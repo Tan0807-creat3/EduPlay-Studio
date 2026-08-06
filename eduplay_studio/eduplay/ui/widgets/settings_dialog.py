@@ -522,7 +522,7 @@ class SettingsDialog(QDialog):
         proxy_row = QHBoxLayout()
         proxy_row.addWidget(QLabel(self._t("settings.ai_base_url", "Base URL")))
         self.groq_base_url_input = QLineEdit()
-        self.groq_base_url_input.setPlaceholderText("")
+        self.groq_base_url_input.setPlaceholderText("https://site--eduplay-ai--sx2zlgv27rbh.code.run/openai/v1")
         proxy_row.addWidget(self.groq_base_url_input)
         api_layout.addLayout(proxy_row)
 
@@ -1433,3 +1433,6 @@ class SettingsDialog(QDialog):
             msg = str(e)
             QMessageBox.information(self, self._t("settings.ai_test_result_title", "Test Result"), self._t("settings.openai_contact_failed", "API key format appears valid but could not contact OpenAI: {error}", error=msg))
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

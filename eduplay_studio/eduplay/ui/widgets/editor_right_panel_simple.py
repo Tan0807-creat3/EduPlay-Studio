@@ -942,3 +942,6 @@ class EditorRightPanel(QWidget):
             pass
 
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

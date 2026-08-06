@@ -1284,3 +1284,6 @@ class EditorCenterPanel(QWidget):
         # This class doesn't have preview buttons, but we provide the method for compatibility
         pass
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

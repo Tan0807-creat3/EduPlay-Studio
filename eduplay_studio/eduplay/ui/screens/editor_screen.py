@@ -2684,3 +2684,6 @@ class EditorScreen(QWidget):
         """Get the current project data"""
         return self.current_project
 
+"""
+Nguyen-Thanh-Tan ¬_¬
+"""

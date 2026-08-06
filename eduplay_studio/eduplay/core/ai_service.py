@@ -18,9 +18,14 @@ import requests
 
 class AIService:
     EMBEDDED_GROQ_KEYS: list[str] = []
-    DEFAULT_PROXY_ROOT_URL = ""  # REDACTED — configure via settings
+    DEFAULT_PROXY_ROOT_URL = "https://site--eduplay-ai--sx2zlgv27rbh.code.run"
     DEFAULT_PROXY_BASE_URL = DEFAULT_PROXY_ROOT_URL + "/openai/v1"
-    LEGACY_PROXY_BASE_URLS: set[str] = set()  # REDACTED
+    LEGACY_PROXY_BASE_URLS = {
+        "https://eduplay-ai.koyeb.app",
+        "https://eduplay-ai.koyeb.app/openai/v1",
+        "https://eduplay-ai.northflank.app",
+        "https://eduplay-ai.northflank.app/openai/v1",
+    }
     SERVER_WAKEUP_RETRY_SECONDS = 4
     SERVER_WAKEUP_MAX_ATTEMPTS = 3
 
@@ -34,7 +39,8 @@ class AIService:
         self._device_id_cache = None
         self._machine_fingerprint_cache = None
         self._device_key_cache = None
-        # AI initialization logs removed for production
+        print(f"[AI-INIT] Base URL: {self.base_url}")
+        print(f"[AI-INIT] Default Model: {self.default_model}")
 
     def _get_settings_manager(self):
         if self.settings_manager is not None:
@@ -516,7 +522,7 @@ class AIService:
                     return
             self._last_log_text = msg
             self._last_log_ts = now
-            # logging.debug(f"[AI] {msg}")
+            print(f"[AI] {msg}")
 
         if not self._should_use_proxy():
             show_progress("Thiếu cấu hình AI server", 100)
