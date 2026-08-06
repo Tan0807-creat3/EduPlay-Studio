@@ -51,9 +51,9 @@ Detailed documentation is available in the `docs/` folder:
 - **[User Guide](docs/USER_GUIDE.md)**: How to use the app and its features.
 - **[Installation Guide](docs/INSTALLATION.md)**: Detailed setup and troubleshooting.
 - **[Roadmap](docs/ROADMAP.md)**: Future plans and upcoming features.
-- **[Security Policy](docs/SECURITY.md)**: How we handle security and reporting.
+- **[Security Policy](SECURITY.md)**: How we handle security and reporting.
 - **[Changelog](docs/CHANGELOG.md)**: History of changes and releases.
-- **[Contributing](docs/CONTRIBUTING.md)**: How to help improve EduPlay Studio.
+- **[Contributing](CONTRIBUTING.md)**: How to help improve EduPlay Studio.
 
 ## 📜 License
 
